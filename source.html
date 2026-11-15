@@ -181,6 +181,7 @@ body.noscroll{overflow:hidden}
 .gal a{display:grid;gap:4px;text-decoration:none;color:var(--muted);font-size:11px;line-height:1.3;min-width:0}
 .gal img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top;background:var(--line);border-radius:4px}
 .gal a:hover img{outline:2px solid var(--red)}
+.pbp em.rc{font-style:normal;color:var(--ink);text-transform:none;letter-spacing:0;font-weight:600}
 footer{font-size:12px;color:var(--muted);padding-block:0 30px}
 a{color:var(--blue)}
 @media (max-width:560px){
@@ -482,6 +483,11 @@ function weightOf(name){
 }
 const eventName = () => document.title.split(":")[0].trim() || "UFC";
 const photoSearch = q => `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(q)}`;
+function ctrlBar(c){
+  const s = t => { const m=String(t||"").match(/(\d+):(\d+)/); return m ? (+m[1])*60+(+m[2]) : 0; };
+  const a=s(c[0]), b=s(c[1]), tot=a+b, pa = tot ? a/tot*100 : 50;
+  return `<div class="sb"><div class="lbl">Control time</div><span>${c[0]}</span><div class="track"><i class="r" style="width:${pa}%"></i><i class="b" style="width:${100-pa}%"></i></div><span class="v2">${c[1]}</span></div>`;
+}
 function openCat(k){
   const c = (window.__CATS||[]).find(x=>x.k===k); if(!c) return;
   window.__OPEN = k;
@@ -572,9 +578,9 @@ function render(){
         const cell=(c,o)=>{ const pre = lf.odds ? lf.odds[c] : o.open; const arrow = pre==null||o.cur==null ? "" : (o.cur<pre ? '<span class="up">▲ more favored now</span>' : o.cur>pre ? '<span class="dn">▼ less favored now</span>' : '<span class="fl">no change</span>');
           return `<div class="lo ${c}"><b>${fmtOdds(o.cur)}</b><span class="mm">pre-fight ${fmtOdds(pre)}</span>${arrow}</div>`; };
         return `<div class="liveodds"><div class="lo-h">Live odds <small>${L.provider||"DraftKings live"}, updates every 20s</small></div><div class="lo-row">${cell("red",L.red)}<div class="lo-mid">${lf.red.split(" ").slice(-1)[0]} vs ${lf.blue.split(" ").slice(-1)[0]}</div>${cell("blue",L.blue)}</div></div>`; })() : ""}
-      ${ls?`<div class="statbars">${bar("Sig. strikes",ls.sig[0],ls.sig[1])}${bar("Takedowns",ls.td[0],ls.td[1])}${ls.kd&&(ls.kd[0]||ls.kd[1])?bar("Knockdowns",ls.kd[0],ls.kd[1]):""}</div>`:""}
+      ${ls?`<div class="statbars">${bar("Sig. strikes",ls.sig[0],ls.sig[1])}${bar("Takedowns",ls.td[0],ls.td[1])}${ls.kd&&(ls.kd[0]||ls.kd[1])?bar("Knockdowns",ls.kd[0],ls.kd[1]):""}${ls.ctrl?ctrlBar(ls.ctrl):""}</div>`:""}
       <div class="rounds">${LIVE.rounds.map(r=>`<div class="rnd"><span class="rl">${r.r}</span><p>${r.t}</p></div>`).join("")}</div>
-      ${LIVE.plays && LIVE.plays.length ? `<div class="pbp"><div class="pbp-h">Play-by-play <small>from ESPN, newest first</small></div><ol>${LIVE.plays.slice().reverse().map(p=>`<li class="${/Knockdown|Submission|Fight Over/i.test(p.t)?"hot":/Round (Start|End)/.test(p.t)?"rd":""}"><span class="pc">R${p.r}${p.clock&&p.clock!=="-"?" "+p.clock:""}</span><span>${p.text||p.t}</span></li>`).join("")}</ol></div>` : ""}`;
+      ${LIVE.plays && LIVE.plays.length ? `<div class="pbp"><div class="pbp-h">Play-by-play <small>from ESPN, newest first</small></div><ol>${LIVE.plays.slice().reverse().map(p=>`<li class="${/Knockdown|Submission|Fight Over/i.test(p.t)?"hot":/Round (Start|End)/.test(p.t)?"rd":""}"><span class="pc">R${p.r}${p.clock&&p.clock!=="-"?" "+p.clock:""}</span><span>${p.text||p.t}${/Round End/i.test(p.t)&&LIVE.ctrlRounds&&LIVE.ctrlRounds[p.r]?` <em class="rc">· Control ${LIVE.ctrlRounds[p.r][2]||""}: ${lf.red.split(" ").slice(-1)[0]} ${LIVE.ctrlRounds[p.r][0]}, ${lf.blue.split(" ").slice(-1)[0]} ${LIVE.ctrlRounds[p.r][1]}</em>`:""}</span></li>`).join("")}</ol></div>` : ""}`;
   } else { $("live-sec").hidden=true; }
 
   $("notes").innerHTML = NOTES.map(n=>`<li><span class="k">${n.k}</span><span>${n.t}</span></li>`).join("");

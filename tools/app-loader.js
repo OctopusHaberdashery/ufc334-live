@@ -6,6 +6,7 @@ const OVERLAYS = {"600061400": "data.json"};
 const FC = id => `https://site.web.api.espn.com/apis/common/v3/sports/mma/ufc/fightcenter/${id}?region=us&lang=en`;
 const SB = "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard";
 const ODDS = (e,c) => `https://sports.core.api.espn.com/v2/sports/mma/leagues/ufc/events/${e}/competitions/${c}/odds?lang=en&region=us`;
+let CTRL_LOG = {}; try{ for(const k of Object.keys(localStorage)) if(k.startsWith('ctrl-')) CTRL_LOG[k.slice(5)] = JSON.parse(localStorage.getItem(k)); }catch(e){}
 let INDEX = null, CUR = null, LIVE_STATE = "pre", TIMER = null, ODDS_CACHE = {};
 const last = n => (n||"").trim().split(/\s+/).slice(-1)[0].toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
 const pairKey = (a,b) => [last(a),last(b)].sort().join("|");
@@ -127,6 +128,18 @@ async function fromESPN(fc, ov){
       const ol = lk && findOv([{red:lk[0],blue:lk[1]}],f.red,f.blue) ? ov.LIVE.rounds : [];
       live.rounds = ol;
       live.plays = await playsFor(fc.event.id, c.id);
+      // ESPN only gives cumulative control time, so snapshot it at each round end while the app is open to get per-round splits.
+      if(s && s.ctrl){
+        const log = CTRL_LOG[c.id] = CTRL_LOG[c.id] || {};
+        // Only snapshot between rounds (latest play is a Round End), so the number is exact for that round.
+        const lastPlay = (live.plays||[]).slice(-1)[0];
+        if(lastPlay && /Round End/i.test(lastPlay.t) && !log[lastPlay.r]) log[lastPlay.r] = s.ctrl.slice();
+        try{ localStorage.setItem("ctrl-"+c.id, JSON.stringify(log)); }catch(e){}
+        const secs = t => { const m=String(t||"").match(/(\d+):(\d+)/); return m ? (+m[1])*60+(+m[2]) : 0; };
+        const fmt = n => Math.floor(n/60)+":"+String(n%60).padStart(2,"0");
+        const rs = Object.keys(log).map(Number).sort((a,b)=>a-b); let prev=[0,0];
+        live.ctrlRounds = {}; rs.forEach(r=>{ const cur=[secs(log[r][0]),secs(log[r][1])]; if(log[r-1]||r===1){ const base = r===1?[0,0]:[secs(log[r-1][0]),secs(log[r-1][1])]; live.ctrlRounds[r]=[fmt(Math.max(0,cur[0]-base[0])),fmt(Math.max(0,cur[1]-base[1])),'in R'+r]; } else live.ctrlRounds[r]=[fmt(cur[0]),fmt(cur[1]),'through R'+r]; });
+      }
     }
     fights.push(f);
   }
@@ -143,7 +156,7 @@ async function showEvent(id){
   if(fc){
     const m = await fromESPN(fc, ov);
     FIGHTS = m.fights; STATS = m.stats; LIVE_STATE = m.state;
-    LIVE = m.live ? {key:"", round:m.live.detail, rounds:m.live.rounds, stats:m.live.stats, plays:m.live.plays} : {round:"",rounds:[]};
+    LIVE = m.live ? {key:"", round:m.live.detail, rounds:m.live.rounds, stats:m.live.stats, plays:m.live.plays, ctrlRounds:m.live.ctrlRounds||{}} : {round:"",rounds:[]};
     name = fc.event.name; venue = fc.venue && fc.venue.displayNameLocation; date = fc.event.date;
   } else {
     FIGHTS = ov.FIGHTS; STATS = ov.STATS||{}; LIVE = ov.LIVE; name = "UFC 334: Gane vs. Hokit"; venue = "Madison Square Garden, New York, NY"; date = "2026-11-14T22:00Z";
