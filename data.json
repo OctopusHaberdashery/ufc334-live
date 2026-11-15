@@ -1,5 +1,5 @@
 {
- "UPDATED": "12:09 AM ET",
+ "UPDATED": "1:02 AM ET",
  "FIGHTS": [
   {
    "seg": "main",
@@ -15,8 +15,13 @@
     "red": -230,
     "blue": 190
    },
-   "status": "live",
-   "note": "Gane's first title defense. Hokit is unbeaten."
+   "status": "final",
+   "winner": "red",
+   "method": "Decision (unanimous)",
+   "round": 5,
+   "time": "5:00",
+   "scores": "48-47 x3",
+   "note": "Gane retains in a close, debated fight. He outlanded Hokit 252-136 in sig strikes, but Hokit had 4:37 of control and 3 takedowns. Rounds per MMA Weekly: R1 Gane, R2 Hokit, R3 Hokit, R4 Gane (body kicks, knees), R5 Gane (stuffed takedowns). Hokit's first pro loss."
   },
   {
    "seg": "main",
@@ -239,7 +244,30 @@
    "note": "Elder's first fight in about 19 months after a leg injury. Sanches was making his UFC debut."
   }
  ],
- "STATS": {},
+ "STATS": {
+  "Ciryl Gane-Josh Hokit": {
+   "sig": [
+    252,
+    136
+   ],
+   "td": [
+    0,
+    3
+   ],
+   "tot": [
+    277,
+    190
+   ],
+   "kd": [
+    0,
+    0
+   ],
+   "ctrl": [
+    "0:04",
+    "4:37"
+   ]
+  }
+ },
  "FIGHTERS": {
   "Ciryl Gane": {
    "rank": "HW champion",
@@ -319,14 +347,9 @@
   }
  },
  "LIVE": {
-  "key": "Ciryl Gane-Josh Hokit",
-  "round": "Main event underway",
-  "rounds": [
-   {
-    "r": "Pre",
-    "t": "Five-round heavyweight title fight. Gane (c) is -230, unbeaten Hokit (HW #5) +190. Gane's first title defense."
-   }
-  ],
+  "key": "",
+  "round": "",
+  "rounds": [],
   "stats": null
  },
  "NOTES": [
@@ -365,6 +388,10 @@
   {
    "k": "Title retained",
    "t": "Kayla Harrison choked out Amanda Nunes in R4 (1:29) to keep the women's bantamweight title in a clash of two legends."
+  },
+  {
+   "k": "Main event",
+   "t": "Ciryl Gane kept the heavyweight title with a unanimous decision (48-47 x3) over Josh Hokit. Some outlets called it controversial: Gane landed far more strikes, Hokit had the control time."
   },
   {
    "k": "Comebacks",

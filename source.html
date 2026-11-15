@@ -251,11 +251,11 @@ a{color:var(--blue)}
 
 <script>
 /* ===== DATA: edit here to update the page ===== */
-const UPDATED = "12:09 AM ET";
+const UPDATED = "1:02 AM ET";
 const FIGHTS = [
   // seg: main | prelims | early ; status: final | live | next
-  {seg:"main", title:"Heavyweight title", red:"Ciryl Gane", redTag:"(c)", rec:["14-2","10-0"], blue:"Josh Hokit", odds:{red:-230, blue:190}, status:"live",
-    note:"Gane's first title defense. Hokit is unbeaten."},
+  {seg:"main", title:"Heavyweight title", red:"Ciryl Gane", redTag:"(c)", rec:["14-2","10-0"], blue:"Josh Hokit", odds:{red:-230, blue:190}, status:"final", winner:"red", method:"Decision (unanimous)", round:5, time:"5:00", scores:"48-47 x3",
+    note:"Gane retains in a close, debated fight. He outlanded Hokit 252-136 in sig strikes, but Hokit had 4:37 of control and 3 takedowns. Rounds per MMA Weekly: R1 Gane, R2 Hokit, R3 Hokit, R4 Gane (body kicks, knees), R5 Gane (stuffed takedowns). Hokit's first pro loss."},
   {seg:"main", title:"Women's bantamweight title", red:"Kayla Harrison", redTag:"(c)", rec:["19-1","23-5"], blue:"Amanda Nunes", odds:{red:-166, blue:140}, status:"final", winner:"red", method:"Submission (rear-naked choke)", round:4, time:"1:29", finish:true,
     note:"Harrison retains. R1 and R2 went to Harrison with takedowns and crucifix control. Nunes took R3 with body shots, a takedown to mount and a back take, though an elbow cut her forehead. In R4 Harrison caught a kick, took her down, took the back and finished the choke. (Round scores per MMA Weekly.) Live odds had swung toward Nunes early, with Harrison drifting from -166 to -125."},
   {seg:"main", title:"Middleweight", red:"Caio Borralho", blue:"Yousri Belgaroui", rec:["18-2","11-3"], odds:{red:-162, blue:136}, status:"final", winner:"red", method:"Decision (unanimous)", round:3, time:"5:00", scores:"30-27 x3",
@@ -286,6 +286,7 @@ const FIGHTS = [
 ];
 // Official stats per fight, keyed "Red-Blue" (full names): sig strikes landed, total strikes landed, takedowns landed
 const STATS = {
+  "Ciryl Gane-Josh Hokit": {sig:[252,136], td:[0,3], tot:[277,190], kd:[0,0], ctrl:["0:04","4:37"]},
 };
 
 // Rankings (UFC, as of Nov 10, 2026) and last 3 fights before tonight
@@ -313,13 +314,7 @@ const FIGHTERS = {
 };
 const slug = n => n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z ]/g,"").trim().replace(/ +/g,"-");
 const initials = n => n.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
-const LIVE = {
-  key:"Ciryl Gane-Josh Hokit", round:"Main event underway",
-  rounds:[
-    {r:"Pre", t:"Five-round heavyweight title fight. Gane (c) is -230, unbeaten Hokit (HW #5) +190. Gane's first title defense."},
-  ],
-  stats:null,
-};
+const LIVE = {key:"", round:"", rounds:[], stats:null};
 const NOTES = [
   {k:"Upset", t:"Luis Gurule (+675) beats unbeaten Bilal Hasan (-1050) by split decision after dropping him in R1."},
   {k:"Upset", t:"Cesar Almeida (+154) stops unbeaten Donte Johnson in R1."},
@@ -330,6 +325,7 @@ const NOTES = [
   {k:"Draw", t:"Uros Medic and Kevin Holland fought to a majority draw (29-27 Medic, 28-28, 28-28). Medic had a point taken in R2 for a second low blow, so without it he would have won."},
   {k:"Dominant", t:"Caio Borralho (MW #6) swept Yousri Belgaroui 30-27 on all cards with takedowns and control in every round."},
   {k:"Title retained", t:"Kayla Harrison choked out Amanda Nunes in R4 (1:29) to keep the women's bantamweight title in a clash of two legends."},
+  {k:"Main event", t:"Ciryl Gane kept the heavyweight title with a unanimous decision (48-47 x3) over Josh Hokit. Some outlets called it controversial: Gane landed far more strikes, Hokit had the control time."},
   {k:"Comebacks", t:"Amanda Nunes returns from retirement to face Kayla Harrison, who is back from neck surgery."},
 ];
 // Official weigh-in weights (lbs), Nov 13, 2026, per Sherdog's weigh-in results
