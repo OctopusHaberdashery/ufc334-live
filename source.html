@@ -176,6 +176,11 @@ body.noscroll{overflow:hidden}
 .lo.red b{color:var(--red)}.lo.blue b{color:var(--blue)}
 .lo-mid{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .lo .up{font-size:12px;color:var(--win);font-weight:600}.lo .dn{font-size:12px;color:var(--upset);font-weight:600}.lo .fl{font-size:12px;color:var(--muted)}
+.mlist li.sec small{font-family:var(--body);font-weight:500;text-transform:none;letter-spacing:0;font-size:11px}
+.mlist li.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.gal a{display:grid;gap:4px;text-decoration:none;color:var(--muted);font-size:11px;line-height:1.3;min-width:0}
+.gal img{width:100%;aspect-ratio:3/4;object-fit:cover;object-position:top;background:var(--line);border-radius:4px}
+.gal a:hover img{outline:2px solid var(--red)}
 footer{font-size:12px;color:var(--muted);padding-block:0 30px}
 a{color:var(--blue)}
 @media (max-width:560px){
@@ -407,6 +412,34 @@ function fighterHead(name, d, extra){
   const img = d.img ? `<img class="fav" src="${esc(d.img)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'av fav',textContent:'${initials(name)}'}))">` : `<span class="av fav">${initials(name)}</span>`;
   return `<div class="fhd">${img}<div class="fhm">${extra}</div></div>`;
 }
+// Freely licensed photos from Wikimedia Commons, loaded live (never copied into the repo), each with author and license.
+const PCACHE = {};
+async function commonsPhotos(name){
+  if(PCACHE[name]) return PCACHE[name];
+  const u = "https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrnamespace=6&gsrlimit=10"
+    + "&gsrsearch=" + encodeURIComponent(`"${name}" filetype:bitmap`) + "&prop=imageinfo&iiprop=url|extmetadata&iiurlwidth=360";
+  const d = await fetch(u).then(r=>r.json());
+  const strip = h => { const t=document.createElement("div"); t.innerHTML = h||""; return (t.textContent||"").trim(); };
+  const pages = Object.values((d.query||{}).pages||{}).sort((a,b)=>(a.index||0)-(b.index||0));
+  PCACHE[name] = pages.map(p=>{ const ii=(p.imageinfo||[])[0]||{}, m=ii.extmetadata||{};
+    return {thumb:ii.thumburl||ii.url, page:ii.descriptionurl, title:strip((m.ObjectName||{}).value)||p.title.replace(/^File:|\.[a-z]+$/gi,""),
+      artist:strip((m.Artist||{}).value).slice(0,60)||"Unknown author", license:(m.LicenseShortName||{}).value||"See file page", date:strip((m.DateTimeOriginal||{}).value).slice(0,10)};
+  }).filter(x=>x.thumb && !/logo|flag|map|signature/i.test(x.title)).slice(0,6);
+  return PCACHE[name];
+}
+async function addPhotos(name){
+  try{
+    const ph = await commonsPhotos(name);
+    const list = $("modal-list"); if($("modal").hidden || !$("modal-head").innerText.toUpperCase().includes(name.toUpperCase())) return;
+    const html = ph.length ? `<li class="sec">Free photos <small>Wikimedia Commons</small></li><li class="gal">${ph.map(x=>`<a href="${esc(x.page)}" target="_blank" rel="noopener"><img src="${esc(x.thumb)}" alt="${esc(x.title)}" loading="lazy"><span>${esc(x.artist)} · ${esc(x.license)}${x.date?" · "+esc(x.date):""}</span></a>`).join("")}</li>`
+      : `<li class="sec">Free photos</li><li class="empty">No freely licensed photos of ${esc(name)} on Wikimedia Commons yet.</li>`;
+    const old = list.querySelector(".gal-wrap"); if(old) old.remove();
+    const links = list.querySelector(".flinks");
+    const wrap = document.createElement("div"); wrap.className="gal-wrap"; wrap.innerHTML = html;
+    [...wrap.children].reverse().forEach(ch=>{ ch.classList.add("gal-wrap-item"); if(links) links.after(ch); else list.append(ch); });
+    list.querySelectorAll(".gal-wrap-item").forEach(()=>{});
+  }catch(e){}
+}
 async function openFighter(btn){
   const name = btn.dataset.fighter, aid = btn.dataset.aid, d = {img:btn.dataset.img, link:btn.dataset.link, rec:btn.dataset.rec};
   const fx = FIGHTERS[name] || Object.entries(FIGHTERS).find(([k])=>k.split(" ").slice(-1)[0]===name.split(" ").slice(-1)[0])?.[1] || {};
@@ -414,7 +447,7 @@ async function openFighter(btn){
   const links = `<li class="flinks">${d.link?`<a href="${esc(d.link)}" target="_blank" rel="noopener">ESPN fighter page ↗</a>`:""}<a href="https://www.ufc.com/athlete/${slug(name)}" target="_blank" rel="noopener">UFC.com profile ↗</a><a href="https://news.google.com/search?q=${encodeURIComponent('"'+name+'" UFC')}" target="_blank" rel="noopener">Latest news search ↗</a></li>`;
   const histFallback = fx.hist ? `<li class="sec">Recent fights</li>${fx.hist.map(h=>`<li class="fh"><span class="wl ${h[0]==="W"?"w":h[0]==="L"?"l":"d"}">${esc(h.split(" ")[0])}</span><span>${esc(h.split(" · ").slice(1).join(" · "))}</span></li>`).join("")}` : "";
   showModal("Fighter profile", (aid?`<li class="empty">Loading fight history and news…</li>`:histFallback)+links, fighterHead(name,d,`<div class="fn">${esc(name)}</div><div class="mm">${facts0||"&nbsp;"}</div>`));
-  if(!aid) return;
+  if(!aid){ addPhotos(name); return; }
   try{
     if(!FCACHE[aid]){
       const base = `https://site.web.api.espn.com/apis/common/v3/sports/mma/athletes/${aid}`;
@@ -434,9 +467,9 @@ async function openFighter(btn){
     const news = (ov.news||[]).slice(0,6);
     const newsHtml = news.length ? `<li class="sec">News</li>` + news.map(n=>`<li class="nw"><a href="${esc((n.links&&n.links.web&&n.links.web.href)||"#")}" target="_blank" rel="noopener">${esc(n.headline)}</a><span class="mm">${shortDate(n.published||n.lastModified)}</span></li>`).join("") : "";
     $("modal-head").innerHTML = fighterHead(name, {img: d.img || (A.headshot&&A.headshot.href)}, `<div class="fn">${esc(name)}${A.nickname?` <span class="nick">"${esc(A.nickname)}"</span>`:""}</div><div class="mm">${facts}</div><div class="mm">${bio}</div>`);
-    $("modal-list").innerHTML = histHtml + newsHtml + links;
+    $("modal-list").innerHTML = histHtml + newsHtml + links; addPhotos(name);
   }catch(e){
-    if(!$("modal").hidden && $("modal-head").innerText.toUpperCase().includes(name.toUpperCase())) $("modal-list").innerHTML = (histFallback||`<li class="empty">Could not load fight history right now.</li>`) + links;
+    if(!$("modal").hidden && $("modal-head").innerText.toUpperCase().includes(name.toUpperCase())) $("modal-list").innerHTML = (histFallback||`<li class="empty">Could not load fight history right now.</li>`) + links; addPhotos(name);
   }
 }
 const flatN = n => (n||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z]/g,"");
