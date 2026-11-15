@@ -121,6 +121,28 @@ img.av{object-fit:cover;object-position:top;background:var(--line)}
 .hist ol{margin:4px 0 0;padding-left:0;list-style:none;display:grid;gap:2px;font-family:var(--mono)}
 .hist li.hw::before{content:"● ";color:var(--win)} .hist li.hl::before{content:"● ";color:var(--red)}
 #evpick{font:600 14px var(--body);background:#1c2129;color:#fff;border:1px solid #39414d;border-radius:4px;padding:5px 8px;max-width:100%;min-width:0}
+.stat{font:inherit;color:inherit;text-align:left;cursor:pointer;display:grid;gap:4px;transition:border-color .15s,transform .15s}
+.stat:hover{border-color:var(--red)}
+.stat:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.stat:active{transform:scale(.98)}
+.stat i{font-style:normal;font-size:11px;font-weight:600;color:var(--red);text-transform:uppercase;letter-spacing:.06em}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(5,7,10,.6);display:flex;align-items:flex-end;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 0 max(12px,env(safe-area-inset-left,0px))}
+@media (min-width:640px){.modal{align-items:center;padding-bottom:16px}}
+.sheet{background:var(--panel);color:var(--ink);width:100%;max-width:620px;max-height:85vh;display:flex;flex-direction:column;border-top:4px solid var(--red);box-shadow:0 20px 60px rgba(0,0,0,.4);padding-bottom:env(safe-area-inset-bottom,0px)}
+.sheet-h{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.sheet-h h3{margin:0;font-family:var(--display);font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.04em;flex:1}
+.x{width:40px;height:40px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:18px;cursor:pointer;border-radius:50%}
+.x:hover{border-color:var(--red);color:var(--red)}
+.mlist{list-style:none;margin:0;padding:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.mlist li{padding:12px 16px;border-bottom:1px solid var(--line);display:grid;gap:3px}
+.mlist li:last-child{border-bottom:0}
+.mh{font-size:16px}.mh b{font-weight:700}.mh em{font-style:normal;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-left:6px;color:var(--red)}
+.mm{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.ms{font-size:14px;color:var(--muted)}
+.mk{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:13px;color:var(--red)}
+.mlist li.empty{color:var(--muted)}
+body.noscroll{overflow:hidden}
+@media (prefers-reduced-motion:reduce){.stat{transition:none}}
 footer{font-size:12px;color:var(--muted);padding-block:0 30px}
 a{color:var(--blue)}
 @media (max-width:560px){
@@ -179,6 +201,12 @@ a{color:var(--blue)}
   </section>
 </main>
 <footer>Results and round notes from MMA Fighting, ESPN and UFC.com coverage. Official strike and takedown totals come from UFCStats.com once each fight ends; "—" means not posted yet. This page is updated by hand through the night.</footer>
+</div>
+<div id="modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="sheet">
+    <div class="sheet-h"><h3 id="modal-title"></h3><button type="button" id="modal-x" class="x" aria-label="Close">✕</button></div>
+    <ul id="modal-list" class="mlist"></ul>
+  </div>
 </div>
 
 <script>
@@ -321,6 +349,33 @@ function fightCard(f){
   return `<article class="fight"><div class="fh"><span>${f.title}</span>${tags.join("")}${pill}</div><div class="fb">${side("red")}${side("blue")}</div>${res}${mini}</article>`;
 }
 
+function openCat(k){
+  const c = (window.__CATS||[]).find(x=>x.k===k); if(!c) return;
+  window.__OPEN = k;
+  const m = $("modal");
+  $("modal-title").textContent = c.s;
+  let body;
+  if(c.notes) body = c.notes.map(n=>`<li><span class="mk">${n.k}</span><span>${n.t}</span></li>`).join("");
+  else body = c.list.map(f=>{
+    const loser = f.winner==="red" ? f.blue : f.red;
+    const head = f.status!=="final" ? `${f.red} vs. ${f.blue} <em>${f.status==="live"?"Live":"Upcoming"}</em>`
+      : f.draw ? `${f.red} and ${f.blue} <em>Draw</em>` : `<b>${f[f.winner]}</b> def. ${loser}`;
+    const how = f.status==="final" ? `${f.method} · R${f.round} ${f.time}${f.scores?` · ${f.scores}`:""}` : "";
+    const st = STATS[f.red+"-"+f.blue];
+    const stl = st && st.sig ? `Sig. strikes ${st.sig[0]}-${st.sig[1]} · Takedowns ${st.td[0]}-${st.td[1]}${st.kd&&(st.kd[0]||st.kd[1])?` · Knockdowns ${st.kd[0]}-${st.kd[1]}`:""}` : "";
+    const sub = c.sub ? c.sub(f) : "";
+    return `<li class="mf"><div class="mh">${head}</div>${how?`<div class="mm">${how}</div>`:""}${stl?`<div class="mm">${stl}</div>`:""}${sub&&sub!==how?`<div class="ms">${sub}</div>`:""}</li>`;
+  }).join("");
+  $("modal-list").innerHTML = body || `<li class="empty">Nothing in this category yet tonight.</li>`;
+  if(m.hidden){ window.__LASTFOCUS = document.activeElement; m.hidden = false; document.body.classList.add("noscroll"); $("modal-x").focus(); }
+}
+function closeModal(){ $("modal").hidden = true; window.__OPEN = null; document.body.classList.remove("noscroll"); if(window.__LASTFOCUS) window.__LASTFOCUS.focus(); }
+document.addEventListener("click", e=>{
+  const t = e.target.closest("[data-cat]"); if(t){ openCat(t.dataset.cat); return; }
+  if(e.target.id==="modal" || e.target.closest("#modal-x")) closeModal();
+});
+document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("modal").hidden) closeModal(); });
+
 function render(){
   $("updated").textContent = "Updated " + UPDATED;
   for (const seg of ["main","prelims","early"]) $("seg-"+seg).innerHTML = FIGHTS.filter(f=>f.seg===seg).map(fightCard).join("");
@@ -332,12 +387,29 @@ function render(){
   const dec = done.filter(f=>/Decision/.test(f.method));
   const withFav = done.filter(f=>favOf(f) && !f.draw);
   const favWins = withFav.filter(f=>favOf(f)===f.winner);
-  $("strip").innerHTML = [
-    [`${done.length}/${FIGHTS.length}`,"Fights complete"],
-    [ko.length,"KO / TKO"],[sub.length,"Submissions"],[dec.length,"Decisions"],[done.filter(f=>f.draw).length,"Draws"],
-    [withFav.length?`${favWins.length}-${withFav.length-favWins.length}`:"—","Favorites W-L"],
-    [FIGHTS.filter(f=>f.missedWeight).length,"Missed weight"],
-  ].map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+  const upsets = done.filter(f=>favOf(f) && !f.draw && favOf(f)!==f.winner);
+  const loser = f => f.winner==="red" ? f.blue : f.red;
+  const resLine = f => f.status!=="final" ? `${f.red} vs. ${f.blue} · ${f.status==="live"?"in progress":"upcoming"}`
+    : f.draw ? `${f.red} and ${f.blue} · ${f.method}${f.scores?` (${f.scores})`:""}`
+    : `<b>${f[f.winner]}</b> def. ${loser(f)} · ${f.method} · R${f.round} ${f.time}${f.scores?` (${f.scores})`:""}`;
+  const oddsLine = f => f.odds ? `${f.red} ${fmtOdds(f.odds.red)} / ${f.blue} ${fmtOdds(f.odds.blue)}` : "";
+  const CATS = [
+    {k:"results", b:`${done.length}/${FIGHTS.length}`, s:"Fights complete", list:FIGHTS, sub:f=>f.title},
+    {k:"ko", b:ko.length, s:"KO / TKO", list:ko, sub:f=>f.note||f.title},
+    {k:"sub", b:sub.length, s:"Submissions", list:sub, sub:f=>f.note||f.title},
+    {k:"dec", b:dec.length, s:"Decisions", list:dec, sub:f=>f.title},
+    {k:"draw", b:done.filter(f=>f.draw).length, s:"Draws", list:done.filter(f=>f.draw), sub:f=>f.note||f.title},
+    {k:"upset", b:upsets.length, s:"Upsets", list:upsets, sub:f=>oddsLine(f)},
+    {k:"fav", b:withFav.length?`${favWins.length}-${withFav.length-favWins.length}`:"—", s:"Favorites W-L", list:withFav, sub:f=>`${favOf(f)===f.winner?"Favorite won":"Underdog won"} · ${oddsLine(f)}`},
+    {k:"weight", b:FIGHTS.filter(f=>f.missedWeight).length, s:"Missed weight", list:FIGHTS.filter(f=>f.missedWeight), sub:f=>f.note||`${f[f.missedWeight]} missed weight`},
+    {k:"retire", b:FIGHTS.filter(f=>f.retire).length, s:"Retirements", list:FIGHTS.filter(f=>f.retire), sub:f=>f.note||""},
+    {k:"title", b:FIGHTS.filter(f=>/title/i.test(f.title)).length, s:"Title fights", list:FIGHTS.filter(f=>/title/i.test(f.title)), sub:f=>`${f.title}${f.odds?" · "+oddsLine(f):""}`},
+  ];
+  if(NOTES.length) CATS.push({k:"notes", b:NOTES.length, s:"Notable moments", notes:NOTES});
+  if(BONUSES.length) CATS.push({k:"bonus", b:BONUSES.filter(x=>!/Announced after/.test(x.t)).length||"TBA", s:"Bonuses", notes:BONUSES});
+  window.__CATS = CATS;
+  $("strip").innerHTML = CATS.map(c=>`<button type="button" class="stat" data-cat="${c.k}" aria-haspopup="dialog"><b>${c.b}</b><span>${c.s}</span><i aria-hidden="true">View ›</i></button>`).join("");
+  if($("modal") && !$("modal").hidden && window.__OPEN) openCat(window.__OPEN);
 
   const lf = FIGHTS.find(f=>f.status==="live");
   if(lf){

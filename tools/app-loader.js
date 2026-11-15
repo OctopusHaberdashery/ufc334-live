@@ -72,7 +72,7 @@ async function fromESPN(fc, ov){
       else if(/no.?contest/i.test(res.name||"")) { f.draw = true; f.method = "No contest"; }
       else f.winner = R.winner ? "red" : B.winner ? "blue" : undefined;
       if(!f.winner && !f.draw) f.draw = true;
-      if(c.judgesScores && /Decision|Draw/i.test(f.method)) f.scores = c.judgesScores.replace(/\s*\|\s*/g,", ");
+      if(c.judgesScores && /Decision|Draw/i.test(f.method)) f.scores = c.judgesScores.split("|").map(x=>{ const n=x.trim().split("-").map(Number); return n.length===2&&!isNaN(n[0])? Math.max(...n)+"-"+Math.min(...n) : x.trim(); }).join(", ");
       f.finish = /KO|TKO|Submission/i.test(f.method);
     }
     // hand-written overlay wins for text, tags and odds
