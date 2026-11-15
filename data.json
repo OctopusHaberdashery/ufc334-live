@@ -1,0 +1,363 @@
+{
+ "UPDATED": "10:36 PM ET",
+ "FIGHTS": [
+  {
+   "seg": "main",
+   "title": "Heavyweight title",
+   "red": "Ciryl Gane",
+   "redTag": "(c)",
+   "rec": [
+    "14-2",
+    "10-0"
+   ],
+   "blue": "Josh Hokit",
+   "odds": {
+    "red": -230,
+    "blue": 190
+   },
+   "status": "next",
+   "note": "Gane's first title defense. Hokit is unbeaten."
+  },
+  {
+   "seg": "main",
+   "title": "Women's bantamweight title",
+   "red": "Kayla Harrison",
+   "redTag": "(c)",
+   "rec": [
+    "19-1",
+    "23-5"
+   ],
+   "blue": "Amanda Nunes",
+   "odds": {
+    "red": -166,
+    "blue": 140
+   },
+   "status": "next",
+   "note": "Nunes returns from about 41 months of retirement. Harrison returns from neck surgery."
+  },
+  {
+   "seg": "main",
+   "title": "Middleweight",
+   "red": "Caio Borralho",
+   "blue": "Yousri Belgaroui",
+   "rec": [
+    "18-2",
+    "11-3"
+   ],
+   "odds": {
+    "red": -162,
+    "blue": 136
+   },
+   "status": "next"
+  },
+  {
+   "seg": "main",
+   "title": "Welterweight",
+   "red": "Uros Medic",
+   "blue": "Kevin Holland",
+   "odds": {
+    "red": -164,
+    "blue": 138
+   },
+   "status": "live"
+  },
+  {
+   "seg": "main",
+   "title": "Flyweight",
+   "red": "Luis Gurule",
+   "blue": "Bilal Hasan",
+   "odds": {
+    "red": 675,
+    "blue": -1050
+   },
+   "status": "final",
+   "winner": "red",
+   "method": "Decision (split)",
+   "round": 3,
+   "time": "5:00",
+   "upset": true,
+   "scores": "29-28, 29-28, 28-29",
+   "note": "Biggest upset of the night. Gurule dropped the unbeaten Hasan in R1, took him down in R2 and R3, and cut him with an elbow in R3."
+  },
+  {
+   "seg": "prelims",
+   "title": "Welterweight",
+   "red": "Stephen Thompson",
+   "blue": "Charles Radtke",
+   "odds": {
+    "red": -142,
+    "blue": 120
+   },
+   "status": "final",
+   "winner": "red",
+   "method": "TKO (spinning wheel kick)",
+   "round": 3,
+   "time": "2:54",
+   "finish": true,
+   "retire": true,
+   "note": "Thompson's retirement fight. He snapped a three-fight skid and finishes his career at 18-9."
+  },
+  {
+   "seg": "prelims",
+   "title": "Lightweight",
+   "red": "Chris Duncan",
+   "blue": "Drew Dober",
+   "odds": {
+    "red": -185,
+    "blue": 154
+   },
+   "status": "final",
+   "winner": "red",
+   "method": "Decision (unanimous)",
+   "round": 3,
+   "time": "5:00",
+   "scores": "30-27, 30-27, 29-28"
+  },
+  {
+   "seg": "prelims",
+   "title": "Lightweight",
+   "red": "Terrance McKinney",
+   "blue": "Jim Miller",
+   "odds": {
+    "red": -205,
+    "blue": 170
+   },
+   "status": "final",
+   "winner": "red",
+   "method": "TKO",
+   "round": 1,
+   "time": "1:53",
+   "finish": true,
+   "missedWeight": "red",
+   "note": "McKinney weighed 160.2, more than 4 lbs over, then needed under two minutes. Miller's 48th UFC fight."
+  },
+  {
+   "seg": "prelims",
+   "title": "Middleweight",
+   "red": "Cesar Almeida",
+   "blue": "Donte Johnson",
+   "odds": {
+    "red": 154,
+    "blue": -185
+   },
+   "status": "final",
+   "winner": "red",
+   "method": "TKO",
+   "round": 1,
+   "time": "3:20",
+   "finish": true,
+   "upset": true,
+   "note": "Johnson's first pro loss. He came in unbeaten and favored."
+  },
+  {
+   "seg": "early",
+   "title": "Lightweight",
+   "red": "Melquizael Costa",
+   "blue": "Jared Gordon",
+   "odds": {
+    "red": -410,
+    "blue": 320
+   },
+   "status": "final",
+   "winner": "red",
+   "method": "Decision (unanimous)",
+   "round": 3,
+   "time": "5:00",
+   "scores": "29-28 x3"
+  },
+  {
+   "seg": "early",
+   "title": "Women's bantamweight",
+   "red": "Bia Mesquita",
+   "blue": "Macy Chiasson",
+   "odds": {
+    "red": -265,
+    "blue": 215
+   },
+   "status": "final",
+   "winner": "red",
+   "method": "Submission (rear-naked choke)",
+   "round": 1,
+   "time": "3:23",
+   "finish": true,
+   "note": "Mesquita called for a title shot after the finish."
+  },
+  {
+   "seg": "early",
+   "title": "Bantamweight",
+   "red": "Juan Diaz",
+   "blue": "Alateng Heili",
+   "odds": {
+    "red": -410,
+    "blue": 320
+   },
+   "status": "final",
+   "winner": "red",
+   "method": "Decision (unanimous)",
+   "round": 3,
+   "time": "5:00",
+   "missedWeight": "red",
+   "scores": "30-27 x3",
+   "note": "Diaz missed weight at 136.4. Heili took the fight on short notice."
+  },
+  {
+   "seg": "early",
+   "title": "Lightweight",
+   "red": "Evan Elder",
+   "blue": "Samuel Sanches",
+   "odds": {
+    "red": -102,
+    "blue": -118
+   },
+   "status": "final",
+   "winner": "red",
+   "method": "Decision (unanimous)",
+   "round": 3,
+   "time": "5:00",
+   "scores": "30-26 x3",
+   "note": "Elder's first fight in about 19 months after a leg injury. Sanches was making his UFC debut."
+  }
+ ],
+ "STATS": {},
+ "FIGHTERS": {
+  "Ciryl Gane": {
+   "rank": "HW champion",
+   "hist": [
+    "W · Alex Pereira · TKO R2 1:27 · Jun 2026",
+    "NC · Tom Aspinall · eye poke R1 · Oct 2025",
+    "W · Alexander Volkov · SD · Dec 2024"
+   ]
+  },
+  "Josh Hokit": {
+   "rank": "HW #5",
+   "hist": [
+    "W · Derrick Lewis · TKO R2 4:09 · Jun 2026",
+    "W · Curtis Blaydes · UD · Apr 2026",
+    "W · Denzel Freeman · TKO R1 4:59 · Jan 2026"
+   ]
+  },
+  "Kayla Harrison": {
+   "rank": "Women's BW champion",
+   "hist": [
+    "W · Julianna Peña · kimura R2 4:55 · Jun 2025 (won title)",
+    "W · Ketlen Vieira · UD · Oct 2024",
+    "W · Holly Holm · RNC R2 1:47 · Apr 2024"
+   ]
+  },
+  "Amanda Nunes": {
+   "rank": "Unranked (returning)",
+   "hist": [
+    "W · Irene Aldana · UD (5 rds) · Jun 2023",
+    "W · Julianna Peña · UD (5 rds) · Jul 2022",
+    "L · Julianna Peña · RNC R2 3:26 · Dec 2021"
+   ]
+  },
+  "Caio Borralho": {
+   "rank": "MW #6",
+   "hist": [
+    "W · Reinier de Ridder · UD · Mar 2026",
+    "L · Nassourdine Imavov · UD (5 rds) · Sep 2025",
+    "W · Jared Cannonier · UD (5 rds) · Aug 2024"
+   ]
+  },
+  "Yousri Belgaroui": {
+   "rank": "Unranked"
+  },
+  "Uros Medic": {
+   "rank": "WW #9",
+   "hist": [
+    "W · Daniel Rodriguez · TKO R1 0:30 · Aug 2026",
+    "W · Geoff Neal · KO R1 1:19 · Feb 2026",
+    "W · Muslim Salikhov · TKO R1 1:03 · Nov 2025"
+   ]
+  },
+  "Kevin Holland": {
+   "rank": "WW #15",
+   "hist": [
+    "W · Randy Brown · UD · Apr 2026",
+    "L · Mike Malott · UD · Oct 2025",
+    "L · Daniel Rodriguez · UD · Jul 2025"
+   ]
+  },
+  "Stephen Thompson": {
+   "rank": "Unranked",
+   "hist": [
+    "L · Gabriel Bonfim · SD · Jul 2025",
+    "L · Joaquin Buckley · KO R3 2:17 · Oct 2024",
+    "L · Shavkat Rakhmonov · RNC R2 4:56 · Dec 2023"
+   ]
+  },
+  "Melquizael Costa": {
+   "rank": "FW #12"
+  },
+  "Bia Mesquita": {
+   "rank": "Women's BW #11"
+  },
+  "Macy Chiasson": {
+   "rank": "Women's BW #14"
+  }
+ },
+ "LIVE": {
+  "key": "Uros Medic-Kevin Holland",
+  "round": "Round 2 underway",
+  "rounds": [
+   {
+    "r": "R1",
+    "t": "Holland lands uppercuts, scores a trip takedown and attacks two ninja chokes. MMA Fighting scores it 10-9 Holland."
+   },
+   {
+    "r": "R2",
+    "t": "Medic looks to be favoring his left knee early. Action is paused after Medic lands a groin kick."
+   }
+  ],
+  "stats": null
+ },
+ "NOTES": [
+  {
+   "k": "Upset",
+   "t": "Luis Gurule (+675) beats unbeaten Bilal Hasan (-1050) by split decision after dropping him in R1."
+  },
+  {
+   "k": "Upset",
+   "t": "Cesar Almeida (+154) stops unbeaten Donte Johnson in R1."
+  },
+  {
+   "k": "Retirement",
+   "t": "Stephen \"Wonderboy\" Thompson retires on a spinning wheel kick TKO of Charles Radtke. Final record 18-9."
+  },
+  {
+   "k": "Missed weight",
+   "t": "Terrance McKinney (160.2 for lightweight) missed by more than 4 lbs, then stopped Jim Miller in 1:53."
+  },
+  {
+   "k": "Missed weight",
+   "t": "Juan Diaz (136.4 for bantamweight) missed and still beat short-notice replacement Alateng Heili."
+  },
+  {
+   "k": "Callout",
+   "t": "Bia Mesquita asked for a title shot after choking out Macy Chiasson in R1."
+  },
+  {
+   "k": "Injury watch",
+   "t": "Uros Medic may be hurt. He was favoring his left knee in R2 against Kevin Holland."
+  },
+  {
+   "k": "Comebacks",
+   "t": "Amanda Nunes returns from retirement to face Kayla Harrison, who is back from neck surgery."
+  }
+ ],
+ "BONUSES": [
+  {
+   "k": "Fight of the Night",
+   "t": "Announced after the main event."
+  },
+  {
+   "k": "Performance",
+   "t": "Announced after the main event."
+  },
+  {
+   "k": "Performance",
+   "t": "Announced after the main event."
+  }
+ ]
+}

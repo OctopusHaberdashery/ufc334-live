@@ -1,0 +1,365 @@
+<title>UFC 334 Fight Night Live</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+/* Layout: broadcast scoreboard. Sticky live ticker, live-fight panel, then results cards by card segment, then notables and odds. */
+:root{
+  --bg:#f3f4f6; --panel:#ffffff; --ink:#0f1218; --muted:#5b6270; --line:#dde1e7;
+  --red:#d0021b; --blue:#1f5fbf; --win:#0f8a4b; --upset:#c27a00; --live:#d0021b;
+  --bar:#0f1218; --barInk:#ffffff;
+  --display:"Barlow Condensed","Arial Narrow",Arial,sans-serif;
+  --body:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0c0e12; --panel:#161a21; --ink:#eef0f3; --muted:#9aa2b0; --line:#272d37;
+  --red:#ff3b4e; --blue:#5b9bff; --win:#34c77b; --upset:#f0a92a; --live:#ff3b4e;
+  --bar:#000000; --barInk:#ffffff; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c0e12; --panel:#161a21; --ink:#eef0f3; --muted:#9aa2b0; --line:#272d37;
+  --red:#ff3b4e; --blue:#5b9bff; --win:#34c77b; --upset:#f0a92a; --live:#ff3b4e;
+  --bar:#000000; --barInk:#ffffff; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bar)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{background:var(--bar);color:var(--barInk);position:sticky;top:env(safe-area-inset-top,0px);z-index:5;border-bottom:3px solid var(--red)}
+header.top .wrap{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:10px}
+.brand{font-family:var(--display);font-weight:800;font-size:26px;letter-spacing:.02em;text-transform:uppercase}
+.brand span{color:var(--red)}
+.venue{font-size:13px;opacity:.75}
+.updated{margin-left:auto;font-family:var(--mono);font-size:12px;opacity:.8}
+.pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:3px}
+.pill.live{background:var(--live);color:#fff}
+.pill.live::before{content:"";width:7px;height:7px;border-radius:50%;background:#fff;animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.pill.live::before{animation:none}}
+.pill.final{background:var(--ink);color:var(--bg)}
+.pill.next{border:1px solid var(--line);color:var(--muted)}
+main{padding-block:20px 48px;display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
+h2{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:22px;margin:0 0 10px;display:flex;align-items:baseline;gap:10px;text-wrap:balance}
+h2 small{font-family:var(--body);font-weight:500;font-size:13px;color:var(--muted);text-transform:none;letter-spacing:0}
+
+/* summary strip */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.stat{background:var(--panel);border:1px solid var(--line);padding:12px 14px}
+.stat b{display:block;font-family:var(--display);font-size:30px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.stat span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+
+/* live panel */
+.livebox{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--live)}
+.livehead{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.livehead .wc{font-size:13px;color:var(--muted)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;padding:18px 16px}
+.corner{min-width:0}
+.corner .nm{font-family:var(--display);font-weight:800;font-size:clamp(26px,5vw,40px);line-height:1;text-transform:uppercase}
+.corner .meta{font-size:13px;color:var(--muted);font-family:var(--mono)}
+.corner.r .nm{color:var(--red)} .corner.b{text-align:right} .corner.b .nm{color:var(--blue)}
+.vs .mid{font-family:var(--display);font-weight:700;color:var(--muted);font-size:18px}
+.rounds{display:grid;gap:0;border-top:1px solid var(--line)}
+.rnd{display:grid;grid-template-columns:64px 1fr;gap:12px;padding:10px 16px;border-bottom:1px solid var(--line)}
+.rnd:last-child{border-bottom:0}
+.rnd .rl{font-family:var(--display);font-weight:800;font-size:18px}
+.rnd p{margin:0;min-width:0}
+.statbars{padding:12px 16px;display:grid;gap:10px;border-top:1px solid var(--line)}
+.sb{display:grid;grid-template-columns:44px 1fr 44px;gap:10px;align-items:center;font-family:var(--mono);font-size:13px;font-variant-numeric:tabular-nums}
+.sb .lbl{grid-column:1/-1;font-family:var(--body);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);text-align:center;margin-bottom:-6px}
+.sb .track{display:flex;height:8px;background:var(--line);overflow:hidden}
+.sb .track i{display:block;height:100%}
+.sb .track i.r{background:var(--red)} .sb .track i.b{background:var(--blue)}
+.sb .v2{text-align:right}
+
+/* fight cards */
+.seg{display:grid;gap:10px}
+.fight{background:var(--panel);border:1px solid var(--line);display:grid;grid-template-columns:1fr;}
+.fight .fh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.fight .fh .tag{font-family:var(--display);font-weight:700;letter-spacing:.08em;padding:1px 6px;border-radius:3px;font-size:12px}
+.tag.upset{background:var(--upset);color:#111}
+.tag.title{background:var(--ink);color:var(--bg)}
+.tag.weight{border:1px solid var(--upset);color:var(--upset)}
+.tag.ret{background:var(--blue);color:#fff}
+.tag.fin{background:var(--red);color:#fff}
+.fight .fh .pill{margin-left:auto}
+.fb{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0}
+.side{padding:12px 14px;display:grid;gap:2px;min-width:0}
+.side + .side{border-left:1px solid var(--line)}
+.side .n{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.05;text-transform:uppercase;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.side .o{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.side.w .n::after{content:"W";font-size:13px;background:var(--win);color:#fff;padding:1px 6px;border-radius:3px}
+.side.l .n{color:var(--muted)}
+.side .ln{font-family:var(--mono);font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fr{padding:10px 14px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline}
+.fr .res{font-family:var(--display);font-weight:700;font-size:17px;text-transform:uppercase;letter-spacing:.02em}
+.fr .note{font-size:14px;color:var(--muted);flex:1 1 260px;min-width:0}
+.mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 18px;padding:0 14px 12px}
+.mini .sb{grid-template-columns:36px 1fr 36px}
+
+/* notables + odds */
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.list{background:var(--panel);border:1px solid var(--line);margin:0;padding:0;list-style:none}
+.list li{padding:10px 14px;border-bottom:1px solid var(--line);display:grid;grid-template-columns:96px 1fr;gap:10px}
+.list li:last-child{border-bottom:0}
+.list li .k{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:13px;color:var(--red)}
+.tbl{overflow-x:auto;background:var(--panel);border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+th{font-family:var(--display);text-transform:uppercase;letter-spacing:.06em;font-size:13px;color:var(--muted)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.ok{color:var(--win);font-weight:600}.no{color:var(--upset);font-weight:600}
+.id{display:flex;gap:10px;align-items:center;min-width:0}
+.idt{min-width:0}
+.av{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:18px;color:#fff;background:var(--red)}
+.side.blue .av{background:var(--blue)}
+.side.l .av{opacity:.5}
+.rk{display:inline-block;margin-right:6px;padding:0 5px;border:1px solid var(--line);border-radius:3px;color:var(--ink)}
+.prof{font-size:12px;margin-top:4px}
+.hist{font-size:12px;margin-top:2px}
+.hist summary{cursor:pointer;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:11px}
+.hist ol{margin:4px 0 0;padding-left:0;list-style:none;display:grid;gap:2px;font-family:var(--mono)}
+.hist li.hw::before{content:"● ";color:var(--win)} .hist li.hl::before{content:"● ";color:var(--red)}
+footer{font-size:12px;color:var(--muted);padding-block:0 30px}
+a{color:var(--blue)}
+@media (max-width:560px){
+  .side .n{font-size:20px}
+  .list li{grid-template-columns:1fr}
+  .vs{grid-template-columns:1fr;text-align:left}.corner.b{text-align:left}
+}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">UFC <span>334</span></div>
+    <div class="venue">Madison Square Garden, New York · Sat, Nov 14, 2026</div>
+    <div class="updated" id="updated"></div>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+  <section>
+    <div class="strip" id="strip"></div>
+  </section>
+
+  <section id="live-sec">
+    <h2>Fight in progress <small id="live-sub"></small></h2>
+    <div class="livebox" id="live"></div>
+  </section>
+
+  <section>
+    <h2>Main card <small>Order shown top to bottom, main event first</small></h2>
+    <div class="seg" id="seg-main"></div>
+  </section>
+  <section>
+    <h2>Prelims</h2>
+    <div class="seg" id="seg-prelims"></div>
+  </section>
+  <section>
+    <h2>Early prelims</h2>
+    <div class="seg" id="seg-early"></div>
+  </section>
+
+  <section class="two">
+    <div>
+      <h2>Notable tonight</h2>
+      <ul class="list" id="notes"></ul>
+    </div>
+    <div>
+      <h2>Bonuses <small>$50,000 each</small></h2>
+      <ul class="list" id="bonuses"></ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Vegas odds scorecard <small>Closing moneyline, favorite listed first</small></h2>
+    <div class="tbl"><table id="odds"></table></div>
+  </section>
+</main>
+<footer>Results and round notes from MMA Fighting, ESPN and UFC.com coverage. Official strike and takedown totals come from UFCStats.com once each fight ends; "—" means not posted yet. This page is updated by hand through the night.</footer>
+</div>
+
+<script>
+/* ===== DATA: edit here to update the page ===== */
+const UPDATED = "10:36 PM ET";
+const FIGHTS = [
+  // seg: main | prelims | early ; status: final | live | next
+  {seg:"main", title:"Heavyweight title", red:"Ciryl Gane", redTag:"(c)", rec:["14-2","10-0"], blue:"Josh Hokit", odds:{red:-230, blue:190}, status:"next",
+    note:"Gane's first title defense. Hokit is unbeaten."},
+  {seg:"main", title:"Women's bantamweight title", red:"Kayla Harrison", redTag:"(c)", rec:["19-1","23-5"], blue:"Amanda Nunes", odds:{red:-166, blue:140}, status:"next",
+    note:"Nunes returns from about 41 months of retirement. Harrison returns from neck surgery."},
+  {seg:"main", title:"Middleweight", red:"Caio Borralho", blue:"Yousri Belgaroui", rec:["18-2","11-3"], odds:{red:-162, blue:136}, status:"next"},
+  {seg:"main", title:"Welterweight", red:"Uros Medic", blue:"Kevin Holland", odds:{red:-164, blue:138}, status:"live"},
+  {seg:"main", title:"Flyweight", red:"Luis Gurule", blue:"Bilal Hasan", odds:{red:675, blue:-1050}, status:"final", winner:"red",
+    method:"Decision (split)", round:3, time:"5:00", upset:true, scores:"29-28, 29-28, 28-29",
+    note:"Biggest upset of the night. Gurule dropped the unbeaten Hasan in R1, took him down in R2 and R3, and cut him with an elbow in R3."},
+
+  {seg:"prelims", title:"Welterweight", red:"Stephen Thompson", blue:"Charles Radtke", odds:{red:-142, blue:120}, status:"final", winner:"red",
+    method:"TKO (spinning wheel kick)", round:3, time:"2:54", finish:true, retire:true,
+    note:"Thompson's retirement fight. He snapped a three-fight skid and finishes his career at 18-9."},
+  {seg:"prelims", title:"Lightweight", red:"Chris Duncan", blue:"Drew Dober", odds:{red:-185, blue:154}, status:"final", winner:"red", method:"Decision (unanimous)", round:3, time:"5:00", scores:"30-27, 30-27, 29-28"},
+  {seg:"prelims", title:"Lightweight", red:"Terrance McKinney", blue:"Jim Miller", odds:{red:-205, blue:170}, status:"final", winner:"red", method:"TKO", round:1, time:"1:53", finish:true, missedWeight:"red",
+    note:"McKinney weighed 160.2, more than 4 lbs over, then needed under two minutes. Miller's 48th UFC fight."},
+  {seg:"prelims", title:"Middleweight", red:"Cesar Almeida", blue:"Donte Johnson", odds:{red:154, blue:-185}, status:"final", winner:"red", method:"TKO", round:1, time:"3:20", finish:true, upset:true,
+    note:"Johnson's first pro loss. He came in unbeaten and favored."},
+
+  {seg:"early", title:"Lightweight", red:"Melquizael Costa", blue:"Jared Gordon", odds:{red:-410, blue:320}, status:"final", winner:"red", method:"Decision (unanimous)", round:3, time:"5:00", scores:"29-28 x3"},
+  {seg:"early", title:"Women's bantamweight", red:"Bia Mesquita", blue:"Macy Chiasson", odds:{red:-265, blue:215}, status:"final", winner:"red", method:"Submission (rear-naked choke)", round:1, time:"3:23", finish:true,
+    note:"Mesquita called for a title shot after the finish."},
+  {seg:"early", title:"Bantamweight", red:"Juan Diaz", blue:"Alateng Heili", odds:{red:-410, blue:320}, status:"final", winner:"red", method:"Decision (unanimous)", round:3, time:"5:00", missedWeight:"red", scores:"30-27 x3",
+    note:"Diaz missed weight at 136.4. Heili took the fight on short notice."},
+  {seg:"early", title:"Lightweight", red:"Evan Elder", blue:"Samuel Sanches", odds:{red:-102, blue:-118}, status:"final", winner:"red", method:"Decision (unanimous)", round:3, time:"5:00", scores:"30-26 x3",
+    note:"Elder's first fight in about 19 months after a leg injury. Sanches was making his UFC debut."},
+];
+// Official stats per fight, keyed "Red-Blue" (full names): sig strikes landed, total strikes landed, takedowns landed
+const STATS = {
+};
+
+// Rankings (UFC, as of Nov 10, 2026) and last 3 fights before tonight
+const FIGHTERS = {
+  "Ciryl Gane": {rank:"HW champion", hist:[
+    "W · Alex Pereira · TKO R2 1:27 · Jun 2026","NC · Tom Aspinall · eye poke R1 · Oct 2025","W · Alexander Volkov · SD · Dec 2024"]},
+  "Josh Hokit": {rank:"HW #5", hist:[
+    "W · Derrick Lewis · TKO R2 4:09 · Jun 2026","W · Curtis Blaydes · UD · Apr 2026","W · Denzel Freeman · TKO R1 4:59 · Jan 2026"]},
+  "Kayla Harrison": {rank:"Women's BW champion", hist:[
+    "W · Julianna Peña · kimura R2 4:55 · Jun 2025 (won title)","W · Ketlen Vieira · UD · Oct 2024","W · Holly Holm · RNC R2 1:47 · Apr 2024"]},
+  "Amanda Nunes": {rank:"Unranked (returning)", hist:[
+    "W · Irene Aldana · UD (5 rds) · Jun 2023","W · Julianna Peña · UD (5 rds) · Jul 2022","L · Julianna Peña · RNC R2 3:26 · Dec 2021"]},
+  "Caio Borralho": {rank:"MW #6", hist:[
+    "W · Reinier de Ridder · UD · Mar 2026","L · Nassourdine Imavov · UD (5 rds) · Sep 2025","W · Jared Cannonier · UD (5 rds) · Aug 2024"]},
+  "Yousri Belgaroui": {rank:"Unranked"},
+  "Uros Medic": {rank:"WW #9", hist:[
+    "W · Daniel Rodriguez · TKO R1 0:30 · Aug 2026","W · Geoff Neal · KO R1 1:19 · Feb 2026","W · Muslim Salikhov · TKO R1 1:03 · Nov 2025"]},
+  "Kevin Holland": {rank:"WW #15", hist:[
+    "W · Randy Brown · UD · Apr 2026","L · Mike Malott · UD · Oct 2025","L · Daniel Rodriguez · UD · Jul 2025"]},
+  "Stephen Thompson": {rank:"Unranked", hist:[
+    "L · Gabriel Bonfim · SD · Jul 2025","L · Joaquin Buckley · KO R3 2:17 · Oct 2024","L · Shavkat Rakhmonov · RNC R2 4:56 · Dec 2023"]},
+  "Melquizael Costa": {rank:"FW #12"},
+  "Bia Mesquita": {rank:"Women's BW #11"},
+  "Macy Chiasson": {rank:"Women's BW #14"},
+};
+const slug = n => n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z ]/g,"").trim().replace(/ +/g,"-");
+const initials = n => n.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
+const LIVE = {
+  key:"Uros Medic-Kevin Holland", round:"Round 2 underway",
+  rounds:[
+    {r:"R1", t:"Holland lands uppercuts, scores a trip takedown and attacks two ninja chokes. MMA Fighting scores it 10-9 Holland."},
+    {r:"R2", t:"Medic looks to be favoring his left knee early. Action is paused after Medic lands a groin kick."},
+  ],
+  stats:null,
+};
+const NOTES = [
+  {k:"Upset", t:"Luis Gurule (+675) beats unbeaten Bilal Hasan (-1050) by split decision after dropping him in R1."},
+  {k:"Upset", t:"Cesar Almeida (+154) stops unbeaten Donte Johnson in R1."},
+  {k:"Retirement", t:"Stephen \"Wonderboy\" Thompson retires on a spinning wheel kick TKO of Charles Radtke. Final record 18-9."},
+  {k:"Missed weight", t:"Terrance McKinney (160.2 for lightweight) missed by more than 4 lbs, then stopped Jim Miller in 1:53."},
+  {k:"Missed weight", t:"Juan Diaz (136.4 for bantamweight) missed and still beat short-notice replacement Alateng Heili."},
+  {k:"Callout", t:"Bia Mesquita asked for a title shot after choking out Macy Chiasson in R1."},
+  {k:"Injury watch", t:"Uros Medic may be hurt. He was favoring his left knee in R2 against Kevin Holland."},
+  {k:"Comebacks", t:"Amanda Nunes returns from retirement to face Kayla Harrison, who is back from neck surgery."},
+];
+const BONUSES = [
+  {k:"Fight of the Night", t:"Announced after the main event."},
+  {k:"Performance", t:"Announced after the main event."},
+  {k:"Performance", t:"Announced after the main event."},
+];
+/* ===== END DATA ===== */
+
+const $ = id => document.getElementById(id);
+const fmtOdds = o => o==null ? "—" : (o>0?"+":"")+o;
+const keyOf = f => f.red+"-"+f.blue;
+
+function bar(label,a,b){
+  const tot=(a||0)+(b||0); const pa = tot? (a/tot*100):50;
+  return `<div class="sb"><div class="lbl">${label}</div><span>${a??"—"}</span><div class="track"><i class="r" style="width:${pa}%"></i><i class="b" style="width:${100-pa}%"></i></div><span class="v2">${b??"—"}</span></div>`;
+}
+function favOf(f){
+  if(!f.odds) return null;
+  const {red,blue}=f.odds;
+  if(red!=null && red<0) return "red";
+  if(blue!=null && blue<0) return "blue";
+  return null;
+}
+
+function fightCard(f){
+  const s = STATS[keyOf(f)];
+  const pill = f.status==="final"?'<span class="pill final">Final</span>':f.status==="live"?'<span class="pill live">Live</span>':'<span class="pill next">Upcoming</span>';
+  const tags = [];
+  if(f.title.includes("title")) tags.push('<span class="tag title">Title</span>');
+  if(f.upset) tags.push('<span class="tag upset">Upset</span>');
+  if(f.finish) tags.push('<span class="tag fin">Finish</span>');
+  if(f.retire) tags.push('<span class="tag ret">Retirement</span>');
+  if(f.missedWeight) tags.push('<span class="tag weight">Missed weight</span>');
+  const side = (c)=>{
+    const nm=f[c], cls = f.status==="final" ? (f.winner===c?"w":"l") : "";
+    const o = f.odds ? fmtOdds(f.odds[c]) : "—";
+    const t = c==="red" && f.redTag ? " "+f.redTag : "";
+    const mw = f.missedWeight===c ? " · missed weight" : ""; const rc = f.rec ? f.rec[c==="red"?0:1]+" · " : "";
+    const fx = FIGHTERS[nm]||{};
+    const rk = fx.rank ? `<span class="rk">${fx.rank}</span>` : "";
+    const hist = fx.hist ? `<details class="hist"><summary>Last 3 fights</summary><ol>${fx.hist.map(h=>`<li class="${h[0]==="W"?"hw":h[0]==="L"?"hl":""}">${h}</li>`).join("")}</ol></details>` : "";
+    return `<div class="side ${cls} ${c}"><div class="id"><span class="av">${initials(nm)}</span><div class="idt"><div class="n">${nm}${t}</div><div class="o">${rk}${rc}Odds ${o}${mw}</div></div></div><a class="prof" href="https://www.ufc.com/athlete/${slug(nm)}" target="_blank" rel="noopener">UFC.com profile and photo ↗</a>${hist}</div>`;
+  };
+  let res = "";
+  if(f.status==="final"){
+    const w = f[f.winner];
+    res = `<div class="fr"><span class="res">${w} · ${f.method} · R${f.round} ${f.time}${f.scores?` (${f.scores})`:""}</span>${f.note?`<span class="note">${f.note}</span>`:""}</div>`;
+  } else if(f.status==="live"){
+    res = `<div class="fr"><span class="res">${LIVE.round}</span><span class="note">Round-by-round notes are in the live panel above.</span></div>`;
+  } else if(f.note){
+    res = `<div class="fr"><span class="note">${f.note}</span></div>`;
+  }
+  const mini = s ? `<div class="mini">${bar("Sig. strikes",s.sig[0],s.sig[1])}${bar("Takedowns",s.td[0],s.td[1])}${s.tot?bar("Total strikes",s.tot[0],s.tot[1]):""}</div>` :
+    (f.status==="final" ? `<div class="mini"><span class="note" style="font-size:12px;color:var(--muted)">Official strike and takedown totals pending from UFCStats.</span></div>`:"");
+  return `<article class="fight"><div class="fh"><span>${f.title}</span>${tags.join("")}${pill}</div><div class="fb">${side("red")}${side("blue")}</div>${res}${mini}</article>`;
+}
+
+function render(){
+  $("updated").textContent = "Updated " + UPDATED;
+  for (const seg of ["main","prelims","early"]) $("seg-"+seg).innerHTML = FIGHTS.filter(f=>f.seg===seg).map(fightCard).join("");
+
+  const done = FIGHTS.filter(f=>f.status==="final");
+  const fin = done.filter(f=>f.finish);
+  const ko = done.filter(f=>/KO/.test(f.method));
+  const sub = done.filter(f=>/Submission/.test(f.method));
+  const dec = done.filter(f=>/Decision/.test(f.method));
+  const withFav = done.filter(f=>favOf(f));
+  const favWins = withFav.filter(f=>favOf(f)===f.winner);
+  $("strip").innerHTML = [
+    [`${done.length}/${FIGHTS.length}`,"Fights complete"],
+    [ko.length,"KO / TKO"],[sub.length,"Submissions"],[dec.length,"Decisions"],
+    [withFav.length?`${favWins.length}-${withFav.length-favWins.length}`:"—","Favorites W-L"],
+    [FIGHTS.filter(f=>f.missedWeight).length,"Missed weight"],
+  ].map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+
+  const lf = FIGHTS.find(f=>f.status==="live");
+  if(lf){
+    $("live-sec").hidden=false;
+    $("live-sub").textContent = lf.title + " · " + LIVE.round;
+    const ls = LIVE.stats;
+    $("live").innerHTML = `
+      <div class="livehead"><span class="pill live">Live</span><span class="wc">${lf.title} · 3 rounds</span></div>
+      <div class="vs">
+        <div class="corner r"><div class="nm">${lf.red}</div><div class="meta">Odds ${fmtOdds(lf.odds?.red)}</div></div>
+        <div class="mid">VS</div>
+        <div class="corner b"><div class="nm">${lf.blue}</div><div class="meta">Odds ${fmtOdds(lf.odds?.blue)}</div></div>
+      </div>
+      ${ls?`<div class="statbars">${bar("Sig. strikes",ls.sig[0],ls.sig[1])}${bar("Takedowns",ls.td[0],ls.td[1])}</div>`:""}
+      <div class="rounds">${LIVE.rounds.map(r=>`<div class="rnd"><span class="rl">${r.r}</span><p>${r.t}</p></div>`).join("")}</div>`;
+  } else { $("live-sec").hidden=true; }
+
+  $("notes").innerHTML = NOTES.map(n=>`<li><span class="k">${n.k}</span><span>${n.t}</span></li>`).join("");
+  $("bonuses").innerHTML = BONUSES.map(n=>`<li><span class="k">${n.k}</span><span>${n.t}</span></li>`).join("");
+
+  const rows = FIGHTS.map(f=>{
+    const fav = favOf(f); const dog = fav==="red"?"blue":"red";
+    let result="—", cls="";
+    if(f.status==="final" && fav){ const ok=f.winner===fav; result= ok?"Favorite won":"Underdog won"; cls= ok?"ok":"no"; }
+    else if(f.status==="final") result = `${f[f.winner]} won · line not posted`;
+    else if(f.status==="live") result="In progress"; else result="Upcoming";
+    const pair = fav ? `${f[fav]} ${fmtOdds(f.odds[fav])} / ${f[dog]} ${fmtOdds(f.odds[dog])}` : `${f.red} / ${f.blue}`;
+    return `<tr><td>${f.red} vs. ${f.blue}</td><td class="num">${pair}</td><td class="${cls}">${result}</td></tr>`;
+  }).join("");
+  $("odds").innerHTML = `<thead><tr><th>Fight</th><th>Moneyline</th><th>Outcome</th></tr></thead><tbody>${rows}</tbody>`;
+}
+render();
+</script>
