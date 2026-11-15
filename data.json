@@ -1,5 +1,5 @@
 {
- "UPDATED": "12:02 AM ET",
+ "UPDATED": "12:09 AM ET",
  "FIGHTS": [
   {
    "seg": "main",
@@ -34,11 +34,11 @@
    },
    "status": "final",
    "winner": "red",
-   "method": "Submission",
-   "round": "?",
-   "time": "(late)",
+   "method": "Submission (rear-naked choke)",
+   "round": 4,
+   "time": "1:29",
    "finish": true,
-   "note": "Harrison retains the title, submitting Nunes late after dominating, per MMA Mania. Exact round and time to be confirmed. Live odds had swung toward Nunes early, with Harrison drifting from -166 to -125."
+   "note": "Harrison retains. R1 and R2 went to Harrison with takedowns and crucifix control. Nunes took R3 with body shots, a takedown to mount and a back take, though an elbow cut her forehead. In R4 Harrison caught a kick, took her down, took the back and finished the choke. (Round scores per MMA Weekly.) Live odds had swung toward Nunes early, with Harrison drifting from -166 to -125."
   },
   {
    "seg": "main",
@@ -364,7 +364,7 @@
   },
   {
    "k": "Title retained",
-   "t": "Kayla Harrison submitted Amanda Nunes late to keep the women's bantamweight title in a clash of two legends."
+   "t": "Kayla Harrison choked out Amanda Nunes in R4 (1:29) to keep the women's bantamweight title in a clash of two legends."
   },
   {
    "k": "Comebacks",
