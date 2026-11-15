@@ -20,6 +20,8 @@ def get(url):
         try:
             r = S.get(url, timeout=30)
             r.raise_for_status()
+            t = re.search(r"<title>(.*?)</title>", r.text, re.S)
+            print("GET", url, r.status_code, len(r.text), "->", r.url, "|", (t.group(1).strip()[:80] if t else "-"), file=sys.stderr)
             return BeautifulSoup(r.text, "html.parser")
         except Exception as e:
             print("retry", url, e, file=sys.stderr); time.sleep(3 * (i + 1))
@@ -94,6 +96,9 @@ def main():
     os.makedirs(OUT, exist_ok=True)
     upcoming = list_events("upcoming")
     completed = list_events("completed")
+    print(len(upcoming), "upcoming,", len(completed), "completed", file=sys.stderr)
+    if not completed:
+        raise SystemExit("No events parsed; UFCStats layout may have changed. Leaving existing data in place.")
     completed = completed[:KEEP_COMPLETED]
     # UFCStats lists today's event under upcoming until it is complete.
     allev = sorted(upcoming, key=lambda e: e["date"]) + completed
