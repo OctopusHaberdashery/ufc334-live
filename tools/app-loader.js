@@ -62,6 +62,7 @@ async function fromESPN(fc, ov){
       rec: [R.displayRecord||"", B.displayRecord||""],
       img: {red: R.athlete.headshot&&R.athlete.headshot.href, blue: B.athlete.headshot&&B.athlete.headshot.href},
       link: {red: R.athlete.link&&R.athlete.link.href, blue: B.athlete.link&&B.athlete.link.href},
+      aid: {red: R.athlete.id || R.id, blue: B.athlete.id || B.id},
       status: ty.state==="post" ? "final" : ty.state==="in" ? "live" : "next",
       odds: ODDS_CACHE[c.id] || null,
       rounds: /title/i.test(titleTxt) ? 5 : 3,

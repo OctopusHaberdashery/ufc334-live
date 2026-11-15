@@ -159,6 +159,22 @@ img.av{object-fit:cover;object-position:top;background:var(--line)}
 .mlist li.empty{color:var(--muted)}
 body.noscroll{overflow:hidden}
 @media (prefers-reduced-motion:reduce){.stat{transition:none}}
+.fname{all:unset;cursor:pointer;border-bottom:2px dotted currentColor;line-height:1.05}
+.fname:hover{color:var(--red)}
+.fname:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+.mhead{padding:14px 16px;border-bottom:1px solid var(--line)}
+.fhd{display:flex;gap:14px;align-items:center}
+.fav{width:72px;height:72px;border-radius:50%;object-fit:cover;object-position:top;background:var(--line);flex:none;font-size:26px}
+.fhm{display:grid;gap:3px;min-width:0}
+.fn{font-family:var(--display);font-weight:800;font-size:26px;text-transform:uppercase;line-height:1}
+.nick{font-family:var(--body);font-weight:500;font-size:14px;text-transform:none;color:var(--muted)}
+.mlist li.sec{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--muted);background:var(--bg);padding-block:6px}
+.mlist li.fh{grid-template-columns:30px 1fr;align-items:start;gap:10px}
+.mlist li.fh > span:last-child{display:grid;gap:2px;min-width:0}
+.wl{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:4px;font-family:var(--display);font-weight:800;color:#fff;background:var(--muted)}
+.wl.w{background:var(--win)}.wl.l{background:var(--red)}
+.mlist li.nw a{color:var(--ink);font-weight:600;text-decoration:none}.mlist li.nw a:hover{color:var(--red)}
+.mlist li.flinks{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px}
 footer{font-size:12px;color:var(--muted);padding-block:0 30px}
 a{color:var(--blue)}
 @media (max-width:560px){
@@ -221,6 +237,7 @@ a{color:var(--blue)}
 <div id="modal" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
   <div class="sheet">
     <div class="sheet-h"><h3 id="modal-title"></h3><button type="button" id="modal-x" class="x" aria-label="Close">✕</button></div>
+    <div id="modal-head" class="mhead" hidden></div>
     <ul id="modal-list" class="mlist"></ul>
   </div>
 </div>
@@ -265,7 +282,7 @@ function fightCard(f){
     const fx = FIGHTERS[nm]||{};
     const rk = fx.rank ? `<span class="rk">${fx.rank}</span>` : "";
     const hist = fx.hist ? `<details class="hist"><summary>Last 3 fights</summary><ol>${fx.hist.map(h=>`<li class="${h[0]==="W"?"hw":h[0]==="L"?"hl":""}">${h}</li>`).join("")}</ol></details>` : "";
-    return `<div class="side ${cls} ${c}"><div class="id">${f.img&&f.img[c]?`<img class="av" src="${f.img[c]}" alt="${nm}" loading="lazy">`:`<span class="av">${initials(nm)}</span>`}<div class="idt"><div class="n">${nm}${t}</div><div class="o">${rk}${rc}Odds ${o}${mw}</div></div></div><a class="prof" href="${f.link&&f.link[c]||"https://www.ufc.com/athlete/"+slug(nm)}" target="_blank" rel="noopener">${f.link&&f.link[c]?"Fighter profile":"UFC.com profile and photo"} ↗</a>${hist}</div>`;
+    return `<div class="side ${cls} ${c}"><div class="id">${f.img&&f.img[c]?`<img class="av" src="${f.img[c]}" alt="${nm}" loading="lazy">`:`<span class="av">${initials(nm)}</span>`}<div class="idt"><div class="n"><button type="button" class="fname" data-fighter="${nm}" data-aid="${f.aid&&f.aid[c]||""}" data-img="${f.img&&f.img[c]||""}" data-link="${f.link&&f.link[c]||""}" data-rec="${f.rec?f.rec[c==="red"?0:1]:""}">${nm}</button>${t}</div><div class="o">${rk}${rc}Odds ${o}${mw}</div></div></div><a class="prof" href="${f.link&&f.link[c]||"https://www.ufc.com/athlete/"+slug(nm)}" target="_blank" rel="noopener">${f.link&&f.link[c]?"Fighter profile":"UFC.com profile and photo"} ↗</a>${hist}</div>`;
   };
   let res = "";
   if(f.status==="final"){
@@ -281,11 +298,57 @@ function fightCard(f){
   return `<article class="fight"><div class="fh"><span>${f.title}</span>${tags.join("")}${pill}</div><div class="fb">${side("red")}${side("blue")}</div>${res}${mini}</article>`;
 }
 
+const FCACHE = {};
+const esc = t => String(t??"").replace(/[&<>"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shortDate = d => { try { return new Date(d).toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}); } catch(e){ return ""; } };
+function showModal(title, html, headHtml){
+  window.__OPEN = null;
+  $("modal-title").textContent = title;
+  $("modal-head").innerHTML = headHtml||""; $("modal-head").hidden = !headHtml;
+  $("modal-list").innerHTML = html;
+  const m=$("modal"); if(m.hidden){ window.__LASTFOCUS=document.activeElement; m.hidden=false; document.body.classList.add("noscroll"); $("modal-x").focus(); }
+}
+function fighterHead(name, d, extra){
+  const img = d.img ? `<img class="fav" src="${esc(d.img)}" alt="" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'av fav',textContent:'${initials(name)}'}))">` : `<span class="av fav">${initials(name)}</span>`;
+  return `<div class="fhd">${img}<div class="fhm">${extra}</div></div>`;
+}
+async function openFighter(btn){
+  const name = btn.dataset.fighter, aid = btn.dataset.aid, d = {img:btn.dataset.img, link:btn.dataset.link, rec:btn.dataset.rec};
+  const fx = FIGHTERS[name] || Object.entries(FIGHTERS).find(([k])=>k.split(" ").slice(-1)[0]===name.split(" ").slice(-1)[0])?.[1] || {};
+  const facts0 = [d.rec&&`Record ${esc(d.rec)}`, fx.rank&&esc(fx.rank)].filter(Boolean).join(" · ");
+  const links = `<li class="flinks">${d.link?`<a href="${esc(d.link)}" target="_blank" rel="noopener">ESPN fighter page ↗</a>`:""}<a href="https://www.ufc.com/athlete/${slug(name)}" target="_blank" rel="noopener">UFC.com profile ↗</a><a href="https://news.google.com/search?q=${encodeURIComponent('"'+name+'" UFC')}" target="_blank" rel="noopener">Latest news search ↗</a></li>`;
+  const histFallback = fx.hist ? `<li class="sec">Recent fights</li>${fx.hist.map(h=>`<li class="fh"><span class="wl ${h[0]==="W"?"w":h[0]==="L"?"l":"d"}">${esc(h.split(" ")[0])}</span><span>${esc(h.split(" · ").slice(1).join(" · "))}</span></li>`).join("")}` : "";
+  showModal("Fighter profile", (aid?`<li class="empty">Loading fight history and news…</li>`:histFallback)+links, fighterHead(name,d,`<div class="fn">${esc(name)}</div><div class="mm">${facts0||"&nbsp;"}</div>`));
+  if(!aid) return;
+  try{
+    if(!FCACHE[aid]){
+      const base = `https://site.web.api.espn.com/apis/common/v3/sports/mma/athletes/${aid}`;
+      const [ath, ov] = await Promise.all([fetch(base+"?region=us&lang=en").then(r=>r.json()), fetch(base+"/overview?region=us&lang=en").then(r=>r.json()).catch(()=>({}))]);
+      FCACHE[aid] = {ath, ov};
+    }
+    if($("modal").hidden || !$("modal-head").innerText.toUpperCase().includes(name.toUpperCase())) return;
+    const {ath, ov} = FCACHE[aid]; const A = ath.athlete||{};
+    const ss = Object.fromEntries(((A.statsSummary||{}).statistics||[]).map(x=>[x.abbreviation,x.displayValue]));
+    const facts = [ss["W-L-D"]&&`Record ${ss["W-L-D"]}`, fx.rank, ss["(T)KO"]&&`KO/TKO ${ss["(T)KO"]}`, ss["SUB"]&&`Sub ${ss["SUB"]}`].filter(Boolean).map(esc).join(" · ");
+    const bio = [A.age&&`Age ${A.age}`, A.displayHeight, A.displayReach&&`${A.displayReach} reach`, A.stance&&A.stance.text, A.association&&A.association.name].filter(Boolean).map(esc).join(" · ");
+    const fights = (ath.events||[]).map(u=>(ath.eventsMap||{})[u]).filter(e=>e && e.gameResult).slice(0,6);
+    const histHtml = fights.length ? `<li class="sec">Recent fights</li>` + fights.map(e=>{
+      const st=e.status||{}, r=(st.result||{}).displayName||"";
+      return `<li class="fh"><span class="wl ${e.gameResult==="W"?"w":e.gameResult==="L"?"l":"d"}">${esc(e.gameResult)}</span><span><b>${esc((e.opponent||{}).displayName||"")}</b><span class="mm">${esc(r)}${st.period?` · R${st.period} ${esc(st.displayClock||"")}`:""}${e.titleFight?" · Title fight":""}</span><span class="mm">${esc(e.shortName||e.name)} · ${shortDate(e.gameDate)}</span></span></li>`;
+    }).join("") : histFallback;
+    const news = (ov.news||[]).slice(0,6);
+    const newsHtml = news.length ? `<li class="sec">News</li>` + news.map(n=>`<li class="nw"><a href="${esc((n.links&&n.links.web&&n.links.web.href)||"#")}" target="_blank" rel="noopener">${esc(n.headline)}</a><span class="mm">${shortDate(n.published||n.lastModified)}</span></li>`).join("") : "";
+    $("modal-head").innerHTML = fighterHead(name, {img: d.img || (A.headshot&&A.headshot.href)}, `<div class="fn">${esc(name)}${A.nickname?` <span class="nick">"${esc(A.nickname)}"</span>`:""}</div><div class="mm">${facts}</div><div class="mm">${bio}</div>`);
+    $("modal-list").innerHTML = histHtml + newsHtml + links;
+  }catch(e){
+    if(!$("modal").hidden && $("modal-head").innerText.toUpperCase().includes(name.toUpperCase())) $("modal-list").innerHTML = (histFallback||`<li class="empty">Could not load fight history right now.</li>`) + links;
+  }
+}
 function openCat(k){
   const c = (window.__CATS||[]).find(x=>x.k===k); if(!c) return;
   window.__OPEN = k;
   const m = $("modal");
-  $("modal-title").textContent = c.s;
+  $("modal-title").textContent = c.s; $("modal-head").hidden = true;
   let body;
   if(c.notes) body = c.notes.map(n=>`<li><span class="mk">${n.k}</span><span>${n.t}</span></li>`).join("");
   else body = c.list.map(f=>{
@@ -306,6 +369,7 @@ function openCat(k){
 function closeModal(){ $("modal").hidden = true; window.__OPEN = null; document.body.classList.remove("noscroll"); if(window.__LASTFOCUS) window.__LASTFOCUS.focus(); }
 document.addEventListener("click", e=>{
   const t = e.target.closest("[data-cat]"); if(t){ openCat(t.dataset.cat); return; }
+  const fbtn = e.target.closest("[data-fighter]"); if(fbtn){ openFighter(fbtn); return; }
   if(e.target.id==="modal" || e.target.closest("#modal-x")) closeModal();
 });
 document.addEventListener("keydown", e=>{ if(e.key==="Escape" && !$("modal").hidden) closeModal(); });
@@ -353,9 +417,9 @@ function render(){
     $("live").innerHTML = `
       <div class="livehead"><span class="pill live">Live</span><span class="wc">${lf.title} · ${lf.rounds||(/title/i.test(lf.title)?5:3)} rounds</span></div>
       <div class="vs">
-        <div class="corner r"><div class="nm">${lf.red}</div><div class="meta">${lf.rec?lf.rec[0]+" · ":""}Odds ${fmtOdds(lf.odds?.red)}</div></div>
+        <div class="corner r"><div class="nm"><button type="button" class="fname" data-fighter="${lf.red}" data-aid="${lf.aid&&lf.aid.red||""}" data-img="${lf.img&&lf.img.red||""}" data-link="${lf.link&&lf.link.red||""}" data-rec="${lf.rec?lf.rec[0]:""}">${lf.red}</button></div><div class="meta">${lf.rec?lf.rec[0]+" · ":""}Odds ${fmtOdds(lf.odds?.red)}</div></div>
         <div class="mid">VS</div>
-        <div class="corner b"><div class="nm">${lf.blue}</div><div class="meta">${lf.rec?lf.rec[1]+" · ":""}Odds ${fmtOdds(lf.odds?.blue)}</div></div>
+        <div class="corner b"><div class="nm"><button type="button" class="fname" data-fighter="${lf.blue}" data-aid="${lf.aid&&lf.aid.blue||""}" data-img="${lf.img&&lf.img.blue||""}" data-link="${lf.link&&lf.link.blue||""}" data-rec="${lf.rec?lf.rec[1]:""}">${lf.blue}</button></div><div class="meta">${lf.rec?lf.rec[1]+" · ":""}Odds ${fmtOdds(lf.odds?.blue)}</div></div>
       </div>
       ${ls?`<div class="statbars">${bar("Sig. strikes",ls.sig[0],ls.sig[1])}${bar("Takedowns",ls.td[0],ls.td[1])}${ls.kd&&(ls.kd[0]||ls.kd[1])?bar("Knockdowns",ls.kd[0],ls.kd[1]):""}</div>`:""}
       <div class="rounds">${LIVE.rounds.map(r=>`<div class="rnd"><span class="rl">${r.r}</span><p>${r.t}</p></div>`).join("")}</div>`;
@@ -440,6 +504,7 @@ async function fromESPN(fc, ov){
       rec: [R.displayRecord||"", B.displayRecord||""],
       img: {red: R.athlete.headshot&&R.athlete.headshot.href, blue: B.athlete.headshot&&B.athlete.headshot.href},
       link: {red: R.athlete.link&&R.athlete.link.href, blue: B.athlete.link&&B.athlete.link.href},
+      aid: {red: R.athlete.id || R.id, blue: B.athlete.id || B.id},
       status: ty.state==="post" ? "final" : ty.state==="in" ? "live" : "next",
       odds: ODDS_CACHE[c.id] || null,
       rounds: /title/i.test(titleTxt) ? 5 : 3,
