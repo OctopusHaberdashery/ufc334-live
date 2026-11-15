@@ -1,35 +1,32 @@
-name: Update UFC results
+name: Update UFC event list
 on:
   workflow_dispatch:
   schedule:
-    - cron: "*/10 21-23 * * 6"   # Saturday evening US time
-    - cron: "*/10 0-7 * * 0"     # through the main event (UTC Sunday morning)
-    - cron: "*/30 21-23 * * 3"   # occasional Wednesday cards
-    - cron: "*/30 0-5 * * 4"
-    - cron: "17 13 * * *"        # daily refresh for new cards and changes
+    - cron: "*/30 20-23 * * 6"   # Saturday afternoon and evening, US time
+    - cron: "*/30 0-6 * * 0"
+    - cron: "17 13 * * *"        # daily refresh for new and changed cards
 permissions:
   contents: write
 concurrency:
   group: scrape
   cancel-in-progress: false
 jobs:
-  scrape:
+  index:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install requests==2.32.3 beautifulsoup4==4.12.3
-      - run: python scraper/probe.py
-      - run: python scraper/scrape.py || true
+      - run: pip install requests==2.32.3
+      - run: python scraper/index.py
       - name: Commit changes
         run: |
           git config user.name "ufc-tracker-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add events
+          git add events/index.json
           if git diff --cached --quiet; then echo "no changes"; exit 0; fi
-          git commit -m "Update results from UFCStats"
+          git commit -m "Update UFC event list"
           git pull --rebase origin main
           git push origin main

@@ -109,6 +109,8 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .ok{color:var(--win);font-weight:600}.no{color:var(--upset);font-weight:600}
 .id{display:flex;gap:10px;align-items:center;min-width:0}
 .idt{min-width:0}
+img.av{object-fit:cover;object-position:top;background:var(--line)}
+.ctrl{grid-column:1/-1;font:12px var(--mono);color:var(--muted);text-align:center}
 .av{flex:none;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:18px;color:#fff;background:var(--red)}
 .side.blue .av{background:var(--blue)}
 .side.l .av{opacity:.5}
@@ -118,6 +120,7 @@ td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .hist summary{cursor:pointer;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:11px}
 .hist ol{margin:4px 0 0;padding-left:0;list-style:none;display:grid;gap:2px;font-family:var(--mono)}
 .hist li.hw::before{content:"● ";color:var(--win)} .hist li.hl::before{content:"● ";color:var(--red)}
+#evpick{font:600 14px var(--body);background:#1c2129;color:#fff;border:1px solid #39414d;border-radius:4px;padding:5px 8px;max-width:100%;min-width:0}
 footer{font-size:12px;color:var(--muted);padding-block:0 30px}
 a{color:var(--blue)}
 @media (max-width:560px){
@@ -180,7 +183,7 @@ a{color:var(--blue)}
 
 <script>
 /* ===== DATA: edit here to update the page ===== */
-const UPDATED = "10:48 PM ET";
+const UPDATED = "10:55 PM ET";
 const FIGHTS = [
   // seg: main | prelims | early ; status: final | live | next
   {seg:"main", title:"Heavyweight title", red:"Ciryl Gane", redTag:"(c)", rec:["14-2","10-0"], blue:"Josh Hokit", odds:{red:-230, blue:190}, status:"next",
@@ -189,8 +192,8 @@ const FIGHTS = [
     note:"Nunes returns from about 41 months of retirement. Harrison returns from neck surgery."},
   {seg:"main", title:"Middleweight", red:"Caio Borralho", blue:"Yousri Belgaroui", rec:["18-2","11-3"], odds:{red:-162, blue:136}, status:"live"},
   {seg:"main", title:"Welterweight", red:"Uros Medic", blue:"Kevin Holland", odds:{red:-164, blue:138}, status:"final", draw:true,
-    method:"Majority draw", round:3, time:"5:00",
-    note:"Holland won R1 with uppercuts, a trip and two ninja choke attempts. Medic appeared to hurt his left knee early in R2, and R2 was paused for a Medic groin kick. Scorecards not yet confirmed."},
+    method:"Majority draw", round:3, time:"5:00", scores:"29-27 Medic, 28-28, 28-28", rec:["14-3-1","29-15-1"],
+    note:"Holland won R1 with uppercuts, a trip and two ninja choke attempts. Medic appeared to hurt his left knee early in R2, and R2 was paused for a Medic groin kick. Medic lost a point in R2 for a second low blow, which cost him the win. He rocked Holland late in R3 but could not finish."},
   {seg:"main", title:"Flyweight", red:"Luis Gurule", blue:"Bilal Hasan", odds:{red:675, blue:-1050}, status:"final", winner:"red",
     method:"Decision (split)", round:3, time:"5:00", upset:true, scores:"29-28, 29-28, 28-29",
     note:"Biggest upset of the night. Gurule dropped the unbeaten Hasan in R1, took him down in R2 and R3, and cut him with an elbow in R3."},
@@ -255,7 +258,7 @@ const NOTES = [
   {k:"Missed weight", t:"Terrance McKinney (160.2 for lightweight) missed by more than 4 lbs, then stopped Jim Miller in 1:53."},
   {k:"Missed weight", t:"Juan Diaz (136.4 for bantamweight) missed and still beat short-notice replacement Alateng Heili."},
   {k:"Callout", t:"Bia Mesquita asked for a title shot after choking out Macy Chiasson in R1."},
-  {k:"Draw", t:"Uros Medic and Kevin Holland fought to a majority draw. Medic was favoring his left knee from early in R2."},
+  {k:"Draw", t:"Uros Medic and Kevin Holland fought to a majority draw (29-27 Medic, 28-28, 28-28). Medic had a point taken in R2 for a second low blow, so without it he would have won."},
   {k:"Comebacks", t:"Amanda Nunes returns from retirement to face Kayla Harrison, who is back from neck surgery."},
 ];
 const BONUSES = [
@@ -276,6 +279,7 @@ function bar(label,a,b){
 function favOf(f){
   if(!f.odds) return null;
   const {red,blue}=f.odds;
+  if(red!=null && blue!=null) return red<blue ? "red" : blue<red ? "blue" : null;
   if(red!=null && red<0) return "red";
   if(blue!=null && blue<0) return "blue";
   return null;
@@ -299,7 +303,7 @@ function fightCard(f){
     const fx = FIGHTERS[nm]||{};
     const rk = fx.rank ? `<span class="rk">${fx.rank}</span>` : "";
     const hist = fx.hist ? `<details class="hist"><summary>Last 3 fights</summary><ol>${fx.hist.map(h=>`<li class="${h[0]==="W"?"hw":h[0]==="L"?"hl":""}">${h}</li>`).join("")}</ol></details>` : "";
-    return `<div class="side ${cls} ${c}"><div class="id"><span class="av">${initials(nm)}</span><div class="idt"><div class="n">${nm}${t}</div><div class="o">${rk}${rc}Odds ${o}${mw}</div></div></div><a class="prof" href="https://www.ufc.com/athlete/${slug(nm)}" target="_blank" rel="noopener">UFC.com profile and photo ↗</a>${hist}</div>`;
+    return `<div class="side ${cls} ${c}"><div class="id">${f.img&&f.img[c]?`<img class="av" src="${f.img[c]}" alt="${nm}" loading="lazy">`:`<span class="av">${initials(nm)}</span>`}<div class="idt"><div class="n">${nm}${t}</div><div class="o">${rk}${rc}Odds ${o}${mw}</div></div></div><a class="prof" href="${f.link&&f.link[c]||"https://www.ufc.com/athlete/"+slug(nm)}" target="_blank" rel="noopener">${f.link&&f.link[c]?"Fighter profile":"UFC.com profile and photo"} ↗</a>${hist}</div>`;
   };
   let res = "";
   if(f.status==="final"){
@@ -310,7 +314,7 @@ function fightCard(f){
   } else if(f.note){
     res = `<div class="fr"><span class="note">${f.note}</span></div>`;
   }
-  const mini = s ? `<div class="mini">${bar("Sig. strikes",s.sig[0],s.sig[1])}${bar("Takedowns",s.td[0],s.td[1])}${s.tot?bar("Total strikes",s.tot[0],s.tot[1]):""}</div>` :
+  const mini = s ? `<div class="mini">${bar("Sig. strikes",s.sig[0],s.sig[1])}${bar("Takedowns",s.td[0],s.td[1])}${s.tot?bar("Total strikes",s.tot[0],s.tot[1]):""}${s.kd&&(s.kd[0]||s.kd[1])?bar("Knockdowns",s.kd[0],s.kd[1]):""}</div>${s.ctrl?`<div class="ctrl">Control time ${s.ctrl[0]} vs ${s.ctrl[1]}</div>`:""}` :
     (f.status==="final" ? `<div class="mini"><span class="note" style="font-size:12px;color:var(--muted)">Official strike and takedown totals pending from UFCStats.</span></div>`:"");
   return `<article class="fight"><div class="fh"><span>${f.title}</span>${tags.join("")}${pill}</div><div class="fb">${side("red")}${side("blue")}</div>${res}${mini}</article>`;
 }
@@ -339,13 +343,13 @@ function render(){
     $("live-sub").textContent = lf.title + " · " + LIVE.round;
     const ls = LIVE.stats;
     $("live").innerHTML = `
-      <div class="livehead"><span class="pill live">Live</span><span class="wc">${lf.title} · 3 rounds</span></div>
+      <div class="livehead"><span class="pill live">Live</span><span class="wc">${lf.title} · ${lf.rounds||(/title/i.test(lf.title)?5:3)} rounds</span></div>
       <div class="vs">
-        <div class="corner r"><div class="nm">${lf.red}</div><div class="meta">Odds ${fmtOdds(lf.odds?.red)}</div></div>
+        <div class="corner r"><div class="nm">${lf.red}</div><div class="meta">${lf.rec?lf.rec[0]+" · ":""}Odds ${fmtOdds(lf.odds?.red)}</div></div>
         <div class="mid">VS</div>
-        <div class="corner b"><div class="nm">${lf.blue}</div><div class="meta">Odds ${fmtOdds(lf.odds?.blue)}</div></div>
+        <div class="corner b"><div class="nm">${lf.blue}</div><div class="meta">${lf.rec?lf.rec[1]+" · ":""}Odds ${fmtOdds(lf.odds?.blue)}</div></div>
       </div>
-      ${ls?`<div class="statbars">${bar("Sig. strikes",ls.sig[0],ls.sig[1])}${bar("Takedowns",ls.td[0],ls.td[1])}</div>`:""}
+      ${ls?`<div class="statbars">${bar("Sig. strikes",ls.sig[0],ls.sig[1])}${bar("Takedowns",ls.td[0],ls.td[1])}${ls.kd&&(ls.kd[0]||ls.kd[1])?bar("Knockdowns",ls.kd[0],ls.kd[1]):""}</div>`:""}
       <div class="rounds">${LIVE.rounds.map(r=>`<div class="rnd"><span class="rl">${r.r}</span><p>${r.t}</p></div>`).join("")}</div>`;
   } else { $("live-sec").hidden=true; }
 

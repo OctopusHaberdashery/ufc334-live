@@ -1,0 +1,182 @@
+/* Every-event loader.
+   Live data: ESPN's public fight center feed, fetched straight from the browser (CORS open).
+   Event list: events/index.json, rebuilt by the GitHub Action.
+   Overlays: hand-written notes, odds, rankings and round notes keyed by event (e.g. data.json for UFC 334). */
+const OVERLAYS = {"600061400": "data.json"};
+const FC = id => `https://site.web.api.espn.com/apis/common/v3/sports/mma/ufc/fightcenter/${id}?region=us&lang=en`;
+const SB = "https://site.api.espn.com/apis/site/v2/sports/mma/ufc/scoreboard";
+const ODDS = (e,c) => `https://sports.core.api.espn.com/v2/sports/mma/leagues/ufc/events/${e}/competitions/${c}/odds?lang=en&region=us`;
+let INDEX = null, CUR = null, LIVE_STATE = "pre", TIMER = null, ODDS_CACHE = {};
+const last = n => (n||"").trim().split(/\s+/).slice(-1)[0].toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"");
+const pairKey = (a,b) => [last(a),last(b)].sort().join("|");
+const flat = n => (n||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z]/g,"");
+const same = (a,b) => flat(b).includes(last(a)) || flat(a).includes(last(b));
+const findOv = (list,r,b) => list.find(o=>(same(o.red,r)&&same(o.blue,b))||(same(o.red,b)&&same(o.blue,r)));
+const fmtDate = d => { try { return new Date(d).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric",year:"numeric"}); } catch(e){ return d; } };
+const nowTime = () => new Date().toLocaleTimeString([], {hour:"numeric",minute:"2-digit"});
+async function getJSON(u, bust){ const r=await fetch(bust?u+(u.includes("?")?"&":"?")+"t="+Date.now():u,{cache:"no-store"}); if(!r.ok) throw new Error(r.status); return r.json(); }
+
+const SEG = {main:"main", prelims1:"prelims", prelims2:"early"};
+const pair = (v) => { if(v==null) return null; const m=String(v).match(/^(\d+)/); return m?+m[1]:null; };
+function statsOf(comp){
+  const g = c => Object.fromEntries((c.stats||[]).map(x=>[x.name,x.displayValue]));
+  const a=g(comp.competitors[0]), b=g(comp.competitors[1]);
+  if(!("sigStrikes" in a)) return null;               // pre-fight feeds carry career averages instead
+  return {sig:[pair(a.sigStrikes),pair(b.sigStrikes)], td:[pair(a.takedowns),pair(b.takedowns)],
+          tot:[pair(a.totalStrikes),pair(b.totalStrikes)], kd:[pair(a.knockDowns),pair(b.knockDowns)],
+          ctrl: a.timeInControl ? [a.timeInControl,b.timeInControl] : null};
+}
+
+async function oddsFor(eid, comp){
+  const k = comp.id; if(k in ODDS_CACHE) return ODDS_CACHE[k];
+  ODDS_CACHE[k] = null;
+  try{
+    const d = await getJSON(ODDS(eid,k));
+    const it = (d.items||[])[0]; if(!it) return null;
+    const ml = s => { const v = s && (s.moneyLine ?? s.current?.moneyLine?.american ?? s.close?.moneyLine?.american); const n=parseInt(v,10); return isNaN(n)?null:n; };
+    const h = ml(it.homeAthleteOdds||it.homeTeamOdds), a = ml(it.awayAthleteOdds||it.awayTeamOdds);
+    if(h==null && a==null) return null;
+    // ESPN treats competitor order 1 as home
+    ODDS_CACHE[k] = {red:h, blue:a};
+  }catch(e){}
+  return ODDS_CACHE[k];
+}
+
+async function fromESPN(fc, ov){
+  const ovF = ov ? ov.FIGHTS : []; const byKey = {}; ovF.forEach(f=>byKey[pairKey(f.red,f.blue)]=f);
+  const fights = [], stats = {}; let live = null;
+  const comps = [];
+  for(const [segName, seg] of Object.entries(fc.cards||{})) for(const c of seg.competitions||[]) comps.push([segName,c]);
+  comps.sort((x,y)=>(x[1].matchNumber||0)-(y[1].matchNumber||0));
+  await Promise.all(comps.map(([,c])=>oddsFor(fc.event.id,c)));
+  for(const [segName,c] of comps){
+    const cs = [...c.competitors].sort((x,y)=>(x.order||0)-(y.order||0));
+    const [R,B] = cs; const st = c.status||{}; const ty = st.type||{};
+    const titleTxt = (c.types&&c.types[0]&&c.types[0].text) || "";
+    const f = {
+      seg: SEG[segName]||"prelims",
+      title: titleTxt ? titleTxt.replace(/^UFC /,"") : (c.type&&c.type.text || "Bout"),
+      red: R.athlete.displayName, blue: B.athlete.displayName,
+      rec: [R.displayRecord||"", B.displayRecord||""],
+      img: {red: R.athlete.headshot&&R.athlete.headshot.href, blue: B.athlete.headshot&&B.athlete.headshot.href},
+      link: {red: R.athlete.link&&R.athlete.link.href, blue: B.athlete.link&&B.athlete.link.href},
+      status: ty.state==="post" ? "final" : ty.state==="in" ? "live" : "next",
+      odds: ODDS_CACHE[c.id] || null,
+      rounds: /title/i.test(titleTxt) ? 5 : 3,
+    };
+    if(f.status==="final"){
+      const res = st.result||{};
+      f.method = res.displayName || ty.detail || "Final";
+      f.round = st.period; f.time = st.displayClock;
+      if(/draw/i.test(res.name||res.displayName||"")) f.draw = true;
+      else if(/no.?contest/i.test(res.name||"")) { f.draw = true; f.method = "No contest"; }
+      else f.winner = R.winner ? "red" : B.winner ? "blue" : undefined;
+      if(!f.winner && !f.draw) f.draw = true;
+      if(c.judgesScores && /Decision|Draw/i.test(f.method)) f.scores = c.judgesScores.replace(/\s*\|\s*/g,", ");
+      f.finish = /KO|TKO|Submission/i.test(f.method);
+    }
+    // hand-written overlay wins for text, tags and odds
+    const o = findOv(ovF,f.red,f.blue);
+    if(o){
+      const flip = !same(o.red,f.red);
+      const sw = obj => obj && (flip ? {red:obj.blue, blue:obj.red} : obj);
+      if(o.odds) f.odds = sw(o.odds);
+      ["note","retire","upset","redTag"].forEach(k=>{ if(o[k]!=null) f[k]=o[k]; });
+      if(o.missedWeight) f.missedWeight = flip ? (o.missedWeight==="red"?"blue":"red") : o.missedWeight;
+      if(o.redTag && flip){ delete f.redTag; }
+      if(f.status!=="final" && o.status==="final"){ Object.assign(f,{status:"final",method:o.method,round:o.round,time:o.time,draw:o.draw,scores:o.scores}); if(o.winner) f.winner = flip ? (o.winner==="red"?"blue":"red") : o.winner; }
+    }
+    if(f.status==="final" && f.odds && f.winner && f.upset==null){
+      const fav = (f.odds.red!=null && f.odds.red<0) ? "red" : (f.odds.blue!=null && f.odds.blue<0) ? "blue" : null;
+      if(fav && fav!==f.winner) f.upset = true;
+    }
+    const s = statsOf(c); if(s) stats[f.red+"-"+f.blue] = s;
+    if(f.status==="live" && !live){
+      live = {fight:f, detail: ty.description==="In Progress" || ty.state==="in" && st.period>0 ? `Round ${st.period}${st.displayClock&&st.displayClock!=="-"?" · "+st.displayClock:""}` : (ty.description||"Live"), stats:s};
+      const lk = ov && ov.LIVE && ov.LIVE.key ? ov.LIVE.key.split("-") : null;
+      const ol = lk && findOv([{red:lk[0],blue:lk[1]}],f.red,f.blue) ? ov.LIVE.rounds : [];
+      live.rounds = ol;
+    }
+    fights.push(f);
+  }
+  return {fights, stats, live, state: (fc.meta&&fc.meta.gameState) || "pre"};
+}
+
+async function showEvent(id){
+  let fc=null, ov=null;
+  try{ fc = await getJSON(FC(id), true); }catch(e){}
+  try{ if(OVERLAYS[id]) ov = await getJSON(OVERLAYS[id], true); }catch(e){}
+  if(!fc && !ov) throw new Error("no data");
+  const meta = INDEX ? INDEX.events.find(e=>e.id===id) : null;
+  let name, venue, date;
+  if(fc){
+    const m = await fromESPN(fc, ov);
+    FIGHTS = m.fights; STATS = m.stats; LIVE_STATE = m.state;
+    LIVE = m.live ? {key:"", round:m.live.detail, rounds:m.live.rounds, stats:m.live.stats} : {round:"",rounds:[]};
+    name = fc.event.name; venue = fc.venue && fc.venue.displayNameLocation; date = fc.event.date;
+  } else {
+    FIGHTS = ov.FIGHTS; STATS = ov.STATS||{}; LIVE = ov.LIVE; name = "UFC 334: Gane vs. Hokit"; venue = "Madison Square Garden, New York, NY"; date = "2026-11-14T22:00Z";
+  }
+  FIGHTERS = ov ? ov.FIGHTERS||{} : {};
+  NOTES = ov ? ov.NOTES||[] : []; BONUSES = ov ? ov.BONUSES||[] : [];
+  UPDATED = fc ? nowTime() : (ov ? ov.UPDATED : "");
+  CUR = id;
+  const [head, sub] = name.split(":").map(x=>x&&x.trim());
+  const num = head.match(/(\d+)$/);
+  document.querySelector(".brand").innerHTML = num ? head.slice(0,-num[1].length)+"<span>"+num[1]+"</span>" : head.replace("UFC Fight Night","UFC <span>Fight Night</span>");
+  document.querySelector(".venue").textContent = [sub, venue, date && fmtDate(date)].filter(Boolean).join(" · ");
+  document.title = name;
+  render();
+  if(!FIGHTS.length) document.getElementById("seg-main").innerHTML='<p class="note">The fight card has not been posted yet.</p>';
+  document.getElementById("seg-early").closest("section").hidden = !FIGHTS.some(f=>f.seg==="early");
+  document.getElementById("seg-prelims").closest("section").hidden = !FIGHTS.some(f=>f.seg==="prelims");
+  document.getElementById("notes").parentElement.hidden = !NOTES.length;
+  document.getElementById("bonuses").parentElement.hidden = !BONUSES.length;
+  document.querySelector("section.two").hidden = !NOTES.length && !BONUSES.length;
+  document.getElementById("odds").closest("section").hidden = !FIGHTS.some(f=>f.odds);
+  document.getElementById("sync").textContent = LIVE_STATE==="in" ? "Live, refreshing every 20s" : "Auto-refresh on";
+}
+
+function pickDefault(){
+  const evs = INDEX.events, now = Date.now();
+  const live = evs.find(e=>e.state==="in"); if(live) return live.id;
+  const next = evs.filter(e=>e.state==="pre").sort((a,b)=>a.date.localeCompare(b.date))[0];
+  const done = evs.filter(e=>e.state==="post").sort((a,b)=>b.date.localeCompare(a.date))[0];
+  if(next && (!done || new Date(next.date)-now < 2*864e5)) return next.id;
+  return (done||next||evs[0]).id;
+}
+function fillPicker(){
+  const sel = document.getElementById("evpick"); if(!INDEX){ sel.hidden=true; return; }
+  const up = INDEX.events.filter(e=>e.state!=="post").sort((a,b)=>a.date.localeCompare(b.date));
+  const done = INDEX.events.filter(e=>e.state==="post").sort((a,b)=>b.date.localeCompare(a.date));
+  const opt = e=>`<option value="${e.id}">${e.state==="in"?"LIVE · ":""}${e.name} · ${fmtDate(e.date)}</option>`;
+  sel.innerHTML = (up.length?`<optgroup label="Live and upcoming">${up.map(opt).join("")}</optgroup>`:"")+`<optgroup label="Past events">${done.map(opt).join("")}</optgroup>`;
+  if(!INDEX.events.some(e=>e.id===CUR)) sel.insertAdjacentHTML("afterbegin",`<option value="${CUR}">${document.title}</option>`);
+  sel.value = CUR; sel.hidden=false;
+}
+function schedule(){ clearTimeout(TIMER); TIMER = setTimeout(()=>refresh(), LIVE_STATE==="in" ? 20000 : 120000); }
+async function refresh(){
+  try{ await showEvent(CUR); }catch(e){ document.getElementById("sync").textContent="Offline, showing last loaded results"; }
+  schedule();
+}
+async function boot(){
+  try{ INDEX = await getJSON("events/index.json", true); }catch(e){ INDEX = null; }
+  // ESPN's scoreboard always points at the current or next event; use it to mark the live one.
+  try{
+    const sb = await getJSON(SB, true); const ev = sb.events && sb.events[0];
+    if(ev){
+      const st = ev.status&&ev.status.type&&ev.status.type.state || "pre";
+      INDEX = INDEX || {events:[]};
+      const hit = INDEX.events.find(e=>e.id===ev.id);
+      if(hit) hit.state = st; else INDEX.events.push({id:ev.id,name:ev.name,date:ev.date,state:st});
+    }
+  }catch(e){}
+  const h = location.hash.replace(/^#e-/,"");
+  CUR = /^\d+$/.test(h) ? h : (INDEX && INDEX.events.length ? pickDefault() : "600061400");
+  await refresh(); fillPicker();
+}
+document.getElementById("evpick").addEventListener("change", e=>{ location.hash="e-"+e.target.value; });
+window.addEventListener("hashchange", ()=>{ const h=location.hash.replace(/^#e-/,""); if(h && h!==CUR){ CUR=h; refresh().then(fillPicker); } });
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) refresh(); });
+boot();
+if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");

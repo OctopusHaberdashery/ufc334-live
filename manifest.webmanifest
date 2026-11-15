@@ -1,6 +1,6 @@
 {
-  "name": "UFC 334 Fight Night Live",
-  "short_name": "UFC 334",
+  "name": "UFC Fight Night Live",
+  "short_name": "UFC Live",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

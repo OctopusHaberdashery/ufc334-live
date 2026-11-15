@@ -1,5 +1,5 @@
 {
- "UPDATED": "10:48 PM ET",
+ "UPDATED": "10:55 PM ET",
  "FIGHTS": [
   {
    "seg": "main",
@@ -64,7 +64,12 @@
    "method": "Majority draw",
    "round": 3,
    "time": "5:00",
-   "note": "Holland won R1 with uppercuts, a trip and two ninja choke attempts. Medic appeared to hurt his left knee early in R2, and R2 was paused for a Medic groin kick. Scorecards not yet confirmed."
+   "scores": "29-27 Medic, 28-28, 28-28",
+   "rec": [
+    "14-3-1",
+    "29-15-1"
+   ],
+   "note": "Holland won R1 with uppercuts, a trip and two ninja choke attempts. Medic appeared to hurt his left knee early in R2, and R2 was paused for a Medic groin kick. Medic lost a point in R2 for a second low blow, which cost him the win. He rocked Holland late in R3 but could not finish."
   },
   {
    "seg": "main",
@@ -340,7 +345,7 @@
   },
   {
    "k": "Draw",
-   "t": "Uros Medic and Kevin Holland fought to a majority draw. Medic was favoring his left knee from early in R2."
+   "t": "Uros Medic and Kevin Holland fought to a majority draw (29-27 Medic, 28-28, 28-28). Medic had a point taken in R2 for a second low blow, so without it he would have won."
   },
   {
    "k": "Comebacks",
