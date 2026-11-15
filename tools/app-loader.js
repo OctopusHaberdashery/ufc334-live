@@ -44,6 +44,14 @@ async function oddsFor(eid, comp){
   return ODDS_CACHE[k];
 }
 
+// ESPN's live event log for one fight: round starts/ends, knockdowns, takedowns, submission attempts, with the clock.
+const SKIP = /^(Fight Open|Walkout|Tale of the tape|Staredown|Unofficial|Results)/i;
+async function playsFor(eid, cid){
+  try{
+    const d = await getJSON(`https://sports.core.api.espn.com/v2/sports/mma/leagues/ufc/events/${eid}/competitions/${cid}/plays?limit=400&lang=en&region=us`, true);
+    return (d.items||[]).filter(p=>p.type && !SKIP.test(p.type.text)).map(p=>({r:(p.period||{}).number||0, clock:(p.clock||{}).displayValue||"", t:p.type.text, text:p.text||p.shortText||""}));
+  }catch(e){ return null; }
+}
 async function fromESPN(fc, ov){
   const ovF = ov ? ov.FIGHTS : []; const byKey = {}; ovF.forEach(f=>byKey[pairKey(f.red,f.blue)]=f);
   const fights = [], stats = {}; let live = null;
@@ -99,6 +107,7 @@ async function fromESPN(fc, ov){
       const lk = ov && ov.LIVE && ov.LIVE.key ? ov.LIVE.key.split("-") : null;
       const ol = lk && findOv([{red:lk[0],blue:lk[1]}],f.red,f.blue) ? ov.LIVE.rounds : [];
       live.rounds = ol;
+      live.plays = await playsFor(fc.event.id, c.id);
     }
     fights.push(f);
   }
@@ -115,7 +124,7 @@ async function showEvent(id){
   if(fc){
     const m = await fromESPN(fc, ov);
     FIGHTS = m.fights; STATS = m.stats; LIVE_STATE = m.state;
-    LIVE = m.live ? {key:"", round:m.live.detail, rounds:m.live.rounds, stats:m.live.stats} : {round:"",rounds:[]};
+    LIVE = m.live ? {key:"", round:m.live.detail, rounds:m.live.rounds, stats:m.live.stats, plays:m.live.plays} : {round:"",rounds:[]};
     name = fc.event.name; venue = fc.venue && fc.venue.displayNameLocation; date = fc.event.date;
   } else {
     FIGHTS = ov.FIGHTS; STATS = ov.STATS||{}; LIVE = ov.LIVE; name = "UFC 334: Gane vs. Hokit"; venue = "Madison Square Garden, New York, NY"; date = "2026-11-14T22:00Z";

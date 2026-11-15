@@ -159,6 +159,14 @@ body.noscroll{overflow:hidden}
 .wl.w{background:var(--win)}.wl.l{background:var(--red)}
 .mlist li.nw a{color:var(--ink);font-weight:600;text-decoration:none}.mlist li.nw a:hover{color:var(--red)}
 .mlist li.flinks{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px}
+.pbp{border-top:1px solid var(--line);padding:10px 16px}
+.pbp-h{font-family:var(--display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;font-size:14px;margin-bottom:6px}
+.pbp-h small{font-family:var(--body);font-weight:500;text-transform:none;letter-spacing:0;color:var(--muted);font-size:12px}
+.pbp ol{list-style:none;margin:0;padding:0;display:grid;gap:2px;max-height:260px;overflow-y:auto}
+.pbp li{display:grid;grid-template-columns:72px 1fr;gap:8px;font-size:14px;padding:3px 0}
+.pbp .pc{font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px}
+.pbp li.rd{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em;border-top:1px dashed var(--line);padding-top:6px}
+.pbp li.hot span:last-child{color:var(--red);font-weight:700}
 footer{font-size:12px;color:var(--muted);padding-block:0 30px}
 a{color:var(--blue)}
 @media (max-width:560px){
@@ -490,7 +498,8 @@ function render(){
         <div class="corner b"><div class="nm"><button type="button" class="fname" data-fighter="${lf.blue}" data-aid="${lf.aid&&lf.aid.blue||""}" data-img="${lf.img&&lf.img.blue||""}" data-link="${lf.link&&lf.link.blue||""}" data-rec="${lf.rec?lf.rec[1]:""}">${lf.blue}</button></div><div class="meta">${lf.rec?lf.rec[1]+" · ":""}Odds ${fmtOdds(lf.odds?.blue)}</div></div>
       </div>
       ${ls?`<div class="statbars">${bar("Sig. strikes",ls.sig[0],ls.sig[1])}${bar("Takedowns",ls.td[0],ls.td[1])}${ls.kd&&(ls.kd[0]||ls.kd[1])?bar("Knockdowns",ls.kd[0],ls.kd[1]):""}</div>`:""}
-      <div class="rounds">${LIVE.rounds.map(r=>`<div class="rnd"><span class="rl">${r.r}</span><p>${r.t}</p></div>`).join("")}</div>`;
+      <div class="rounds">${LIVE.rounds.map(r=>`<div class="rnd"><span class="rl">${r.r}</span><p>${r.t}</p></div>`).join("")}</div>
+      ${LIVE.plays && LIVE.plays.length ? `<div class="pbp"><div class="pbp-h">Play-by-play <small>from ESPN, newest first</small></div><ol>${LIVE.plays.slice().reverse().map(p=>`<li class="${/Knockdown|Submission|Fight Over/i.test(p.t)?"hot":/Round (Start|End)/.test(p.t)?"rd":""}"><span class="pc">R${p.r}${p.clock&&p.clock!=="-"?" "+p.clock:""}</span><span>${p.text||p.t}</span></li>`).join("")}</ol></div>` : ""}`;
   } else { $("live-sec").hidden=true; }
 
   $("notes").innerHTML = NOTES.map(n=>`<li><span class="k">${n.k}</span><span>${n.t}</span></li>`).join("");
