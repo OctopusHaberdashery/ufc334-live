@@ -29,17 +29,35 @@ function statsOf(cs){
           ctrl: a.timeInControl ? [a.timeInControl,b.timeInControl] : null};
 }
 
-async function oddsFor(eid, comp){
-  const k = comp.id; if(k in ODDS_CACHE) return ODDS_CACHE[k];
-  ODDS_CACHE[k] = null;
+// Odds come from ESPN's core odds feed. Each line names its athlete, so map by athlete id (never by home/away guess).
+// Provider 100 = DraftKings pre-fight line, provider 200 = DraftKings live in-fight line.
+const ODDS_HIST = {};
+async function oddsFor(eid, comp, force){
+  const k = comp.id; if(!force && k in ODDS_CACHE) return ODDS_CACHE[k];
+  if(!(k in ODDS_CACHE)) ODDS_CACHE[k] = null;
   try{
-    const d = await getJSON(ODDS(eid,k));
-    const it = (d.items||[])[0]; if(!it) return null;
-    const ml = s => { const v = s && (s.moneyLine ?? s.current?.moneyLine?.american ?? s.close?.moneyLine?.american); const n=parseInt(v,10); return isNaN(n)?null:n; };
-    const h = ml(it.homeAthleteOdds||it.homeTeamOdds), a = ml(it.awayAthleteOdds||it.awayTeamOdds);
-    if(h==null && a==null) return null;
-    // ESPN treats competitor order 1 as home
-    ODDS_CACHE[k] = {red:h, blue:a};
+    const d = await getJSON(ODDS(eid,k), force);
+    const aidOf = o => { const r = o && o.athlete && o.athlete.$ref; const m = r && r.match(/athletes\/(\d+)/); return m ? m[1] : null; };
+    const am = v => { const n = parseInt(v,10); return isNaN(n) ? null : n; };
+    const order1 = (comp.competitors.find(c=>c.order===1)||comp.competitors[0]).athlete.id;
+    const order2 = (comp.competitors.find(c=>c.order===2)||comp.competitors[1]).athlete.id;
+    const out = {pre:{}, live:null, provider:null};
+    let homeAid = null;
+    for(const it of d.items||[]) if(aidOf(it.homeAthleteOdds)) homeAid = aidOf(it.homeAthleteOdds);
+    for(const it of d.items||[]){
+      const H = it.homeAthleteOdds||{}, A = it.awayAthleteOdds||{};
+      const hA = aidOf(H) || homeAid || order1, aA = aidOf(A) || (hA===order1 ? order2 : order1);
+      const isLive = /live/i.test((it.provider||{}).name||"") || String((it.provider||{}).id)==="200";
+      if(isLive){
+        const cur = o => am(o.moneyLine ?? o.current?.moneyLine?.american), open = o => am(o.open?.moneyLine?.american);
+        out.live = {provider:(it.provider||{}).name, [hA]:{cur:cur(H), open:open(H)}, [aA]:{cur:cur(A), open:open(A)}};
+      } else if(!Object.keys(out.pre).length){
+        out.pre[hA] = am(H.moneyLine ?? H.close?.moneyLine?.american); out.pre[aA] = am(A.moneyLine ?? A.close?.moneyLine?.american);
+        out.provider = (it.provider||{}).name;
+      }
+    }
+    ODDS_CACHE[k] = out;
+    if(out.live){ const h = ODDS_HIST[k] = ODDS_HIST[k]||[]; const snap = JSON.stringify([out.live[order1]?.cur,out.live[order2]?.cur]); if(!h.length || h[h.length-1].v!==snap) h.push({v:snap, t:Date.now(), a:out.live[order1]?.cur, b:out.live[order2]?.cur}); }
   }catch(e){}
   return ODDS_CACHE[k];
 }
@@ -58,7 +76,7 @@ async function fromESPN(fc, ov){
   const comps = [];
   for(const [segName, seg] of Object.entries(fc.cards||{})) for(const c of seg.competitions||[]) comps.push([segName,c]);
   comps.sort((x,y)=>(x[1].matchNumber||0)-(y[1].matchNumber||0));
-  await Promise.all(comps.map(([,c])=>oddsFor(fc.event.id,c)));
+  await Promise.all(comps.map(([,c])=>oddsFor(fc.event.id,c,(c.status&&c.status.type&&c.status.type.state)==='in')));
   for(const [segName,c] of comps){
     const cs = [...c.competitors].sort((x,y)=>(x.order||0)-(y.order||0));
     const [R,B] = cs; const st = c.status||{}; const ty = st.type||{};
@@ -72,7 +90,8 @@ async function fromESPN(fc, ov){
       link: {red: R.athlete.link&&R.athlete.link.href, blue: B.athlete.link&&B.athlete.link.href},
       aid: {red: R.athlete.id || R.id, blue: B.athlete.id || B.id},
       status: ty.state==="post" ? "final" : ty.state==="in" ? "live" : "next",
-      odds: ODDS_CACHE[c.id] || null,
+      odds: (()=>{ const o=ODDS_CACHE[c.id]; if(!o) return null; const r=o.pre[R.athlete.id], b=o.pre[B.athlete.id]; return (r==null&&b==null)?null:{red:r, blue:b}; })(),
+      liveOdds: (()=>{ const o=ODDS_CACHE[c.id]; if(!o||!o.live||ty.state!=="in") return null; return {provider:o.live.provider, red:o.live[R.athlete.id]||{}, blue:o.live[B.athlete.id]||{}, hist:(ODDS_HIST[c.id]||[]).length}; })(),
       rounds: /title/i.test(titleTxt) ? 5 : 3,
     };
     if(f.status==="final"){
