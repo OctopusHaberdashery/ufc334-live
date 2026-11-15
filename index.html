@@ -262,7 +262,7 @@ a{color:var(--blue)}
 <script>
 const slug = n => n.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z ]/g,"").trim().replace(/ +/g,"-");
 const initials = n => n.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
-let UPDATED, FIGHTS, STATS, FIGHTERS, LIVE, NOTES, BONUSES;
+let UPDATED, FIGHTS, STATS, FIGHTERS, LIVE, NOTES, BONUSES, WEIGHINS = {};
 
 const $ = id => document.getElementById(id);
 const fmtOdds = o => o==null ? "—" : (o>0?"+":"")+o;
@@ -295,7 +295,7 @@ function fightCard(f){
     const nm=f[c], cls = f.status==="final" && !f.draw ? (f.winner===c?"w":"l") : "";
     const o = f.odds ? fmtOdds(f.odds[c]) : "—";
     const t = c==="red" && f.redTag ? " "+f.redTag : "";
-    const mw = f.missedWeight===c ? " · missed weight" : ""; const rc = f.rec ? f.rec[c==="red"?0:1]+" · " : "";
+    const wt = weightOf(nm); const mw = (wt?` · weighed ${wt}`:"") + (f.missedWeight===c ? " (missed weight)" : ""); const rc = f.rec ? f.rec[c==="red"?0:1]+" · " : "";
     const fx = FIGHTERS[nm]||{};
     const rk = fx.rank ? `<span class="rk">${fx.rank}</span>` : "";
     const hist = fx.hist ? `<details class="hist"><summary>Last 3 fights</summary><ol>${fx.hist.map(h=>`<li class="${h[0]==="W"?"hw":h[0]==="L"?"hl":""}">${h}</li>`).join("")}</ol></details>` : "";
@@ -361,13 +361,31 @@ async function openFighter(btn){
     if(!$("modal").hidden && $("modal-head").innerText.toUpperCase().includes(name.toUpperCase())) $("modal-list").innerHTML = (histFallback||`<li class="empty">Could not load fight history right now.</li>`) + links;
   }
 }
+const flatN = n => (n||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z]/g,"");
+function weightOf(name){
+  if(typeof WEIGHINS==="undefined" || !WEIGHINS) return null;
+  if(WEIGHINS[name]!=null) return WEIGHINS[name];
+  const ln = flatN(name.split(" ").slice(-1)[0]);
+  const k = Object.keys(WEIGHINS).find(k=>k!=="source" && (flatN(k).includes(ln) || flatN(name).includes(flatN(k.split(" ").slice(-1)[0]))));
+  return k ? WEIGHINS[k] : null;
+}
+const eventName = () => document.title.split(":")[0].trim() || "UFC";
+const photoSearch = q => `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(q)}`;
 function openCat(k){
   const c = (window.__CATS||[]).find(x=>x.k===k); if(!c) return;
   window.__OPEN = k;
   const m = $("modal");
   $("modal-title").textContent = c.s; $("modal-head").hidden = true;
   let body;
-  if(c.notes) body = c.notes.map(n=>`<li><span class="mk">${n.k}</span><span>${n.t}</span></li>`).join("");
+  if(c.weighin){
+    const ev = eventName(); const src = WEIGHINS && WEIGHINS.source;
+    body = `<li class="flinks"><a href="${photoSearch(ev+" weigh-ins")}" target="_blank" rel="noopener">All ${esc(ev)} weigh-in photos ↗</a>${src?`<a href="${src.url}" target="_blank" rel="noopener">${esc(src.label)} ↗</a>`:""}<a href="https://www.ufc.com/news" target="_blank" rel="noopener">UFC.com news and galleries ↗</a></li>` +
+      FIGHTS.map(f=>{
+        const wr = weightOf(f.red), wb = weightOf(f.blue);
+        const tag = c2 => f.missedWeight===c2 ? ' <em>Missed weight</em>' : "";
+        return `<li class="mf"><div class="mh">${esc(f.red)} <span class="mm">${wr??"—"} lbs</span>${tag("red")} vs. ${esc(f.blue)} <span class="mm">${wb??"—"} lbs</span>${tag("blue")}</div><div class="ms">${esc(f.title)}</div><div class="flinks"><a href="${photoSearch(f.red+" "+f.blue+" "+ev+" weigh-in")}" target="_blank" rel="noopener">Weigh-in and face-off photos ↗</a></div></li>`;
+      }).join("");
+  } else if(c.notes) body = c.notes.map(n=>`<li><span class="mk">${n.k}</span><span>${n.t}</span></li>`).join("");
   else body = c.list.map(f=>{
     const loser = f.winner==="red" ? f.blue : f.red;
     const head = f.status!=="final" ? `${f.red} vs. ${f.blue} <em>${f.status==="live"?"Live":"Upcoming"}</em>`
@@ -420,6 +438,7 @@ function render(){
     {k:"retire", b:FIGHTS.filter(f=>f.retire).length, s:"Retirements", list:FIGHTS.filter(f=>f.retire), sub:f=>f.note||""},
     {k:"title", b:FIGHTS.filter(f=>/title/i.test(f.title)).length, s:"Title fights", list:FIGHTS.filter(f=>/title/i.test(f.title)), sub:f=>`${f.title}${f.odds?" · "+oddsLine(f):""}`},
   ];
+  CATS.push({k:"weighin", b:FIGHTS.length?Object.keys(WEIGHINS||{}).filter(k=>k!=="source").length||"View":"—", s:"Weigh-ins", weighin:true});
   if(NOTES.length) CATS.push({k:"notes", b:NOTES.length, s:"Notable moments", notes:NOTES});
   if(BONUSES.length) CATS.push({k:"bonus", b:BONUSES.filter(x=>!/Announced after/.test(x.t)).length||"TBA", s:"Bonuses", notes:BONUSES});
   window.__CATS = CATS;
@@ -613,7 +632,7 @@ async function showEvent(id){
     FIGHTS = ov.FIGHTS; STATS = ov.STATS||{}; LIVE = ov.LIVE; name = "UFC 334: Gane vs. Hokit"; venue = "Madison Square Garden, New York, NY"; date = "2026-11-14T22:00Z";
   }
   FIGHTERS = ov ? ov.FIGHTERS||{} : {};
-  NOTES = ov ? ov.NOTES||[] : []; BONUSES = ov ? ov.BONUSES||[] : [];
+  NOTES = ov ? ov.NOTES||[] : []; BONUSES = ov ? ov.BONUSES||[] : []; WEIGHINS = ov ? ov.WEIGHINS||{} : {};
   UPDATED = fc ? nowTime() : (ov ? ov.UPDATED : "");
   CUR = id;
   const [head, sub] = name.split(":").map(x=>x&&x.trim());

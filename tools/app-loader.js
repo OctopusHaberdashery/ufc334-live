@@ -149,7 +149,7 @@ async function showEvent(id){
     FIGHTS = ov.FIGHTS; STATS = ov.STATS||{}; LIVE = ov.LIVE; name = "UFC 334: Gane vs. Hokit"; venue = "Madison Square Garden, New York, NY"; date = "2026-11-14T22:00Z";
   }
   FIGHTERS = ov ? ov.FIGHTERS||{} : {};
-  NOTES = ov ? ov.NOTES||[] : []; BONUSES = ov ? ov.BONUSES||[] : [];
+  NOTES = ov ? ov.NOTES||[] : []; BONUSES = ov ? ov.BONUSES||[] : []; WEIGHINS = ov ? ov.WEIGHINS||{} : {};
   UPDATED = fc ? nowTime() : (ov ? ov.UPDATED : "");
   CUR = id;
   const [head, sub] = name.split(":").map(x=>x&&x.trim());

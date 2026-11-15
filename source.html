@@ -326,6 +326,15 @@ const NOTES = [
   {k:"Title retained", t:"Kayla Harrison submitted Amanda Nunes late to keep the women's bantamweight title in a clash of two legends."},
   {k:"Comebacks", t:"Amanda Nunes returns from retirement to face Kayla Harrison, who is back from neck surgery."},
 ];
+// Official weigh-in weights (lbs), Nov 13, 2026, per Sherdog's weigh-in results
+const WEIGHINS = {
+  source:{label:"Sherdog weigh-in results", url:"https://www.sherdog.com/news/news/UFC-334-weighin-results-2-title-fights-set-2-fighters-heavy-203617"},
+  "Ciryl Gane":242.6, "Josh Hokit":231.4, "Kayla Harrison":135, "Amanda Nunes":135, "Caio Borralho":185.4, "Yousri Belgaroui":186,
+  "Uros Medic":171, "Kevin Holland":170.4, "Bilal Hasan":125.4, "Luis Gurule":125.2, "Stephen Thompson":170.6, "Charles Radtke":170.8,
+  "Drew Dober":155.4, "Chris Duncan":155.4, "Jim Miller":155.6, "Terrance McKinney":160.2, "Donte Johnson":189, "Cesar Almeida":189.6,
+  "Jared Gordon":155.6, "Melquizael Costa":155.4, "Macy Chiasson":134.8, "Bia Mesquita":135.8, "Juan Diaz":136.4, "Alateng Heili":135.6,
+  "Evan Elder":156, "Samuel Sanches":153.6,
+};
 const BONUSES = [
   {k:"Fight of the Night", t:"Announced after the main event."},
   {k:"Performance", t:"Announced after the main event."},
@@ -364,7 +373,7 @@ function fightCard(f){
     const nm=f[c], cls = f.status==="final" && !f.draw ? (f.winner===c?"w":"l") : "";
     const o = f.odds ? fmtOdds(f.odds[c]) : "—";
     const t = c==="red" && f.redTag ? " "+f.redTag : "";
-    const mw = f.missedWeight===c ? " · missed weight" : ""; const rc = f.rec ? f.rec[c==="red"?0:1]+" · " : "";
+    const wt = weightOf(nm); const mw = (wt?` · weighed ${wt}`:"") + (f.missedWeight===c ? " (missed weight)" : ""); const rc = f.rec ? f.rec[c==="red"?0:1]+" · " : "";
     const fx = FIGHTERS[nm]||{};
     const rk = fx.rank ? `<span class="rk">${fx.rank}</span>` : "";
     const hist = fx.hist ? `<details class="hist"><summary>Last 3 fights</summary><ol>${fx.hist.map(h=>`<li class="${h[0]==="W"?"hw":h[0]==="L"?"hl":""}">${h}</li>`).join("")}</ol></details>` : "";
@@ -430,13 +439,31 @@ async function openFighter(btn){
     if(!$("modal").hidden && $("modal-head").innerText.toUpperCase().includes(name.toUpperCase())) $("modal-list").innerHTML = (histFallback||`<li class="empty">Could not load fight history right now.</li>`) + links;
   }
 }
+const flatN = n => (n||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z]/g,"");
+function weightOf(name){
+  if(typeof WEIGHINS==="undefined" || !WEIGHINS) return null;
+  if(WEIGHINS[name]!=null) return WEIGHINS[name];
+  const ln = flatN(name.split(" ").slice(-1)[0]);
+  const k = Object.keys(WEIGHINS).find(k=>k!=="source" && (flatN(k).includes(ln) || flatN(name).includes(flatN(k.split(" ").slice(-1)[0]))));
+  return k ? WEIGHINS[k] : null;
+}
+const eventName = () => document.title.split(":")[0].trim() || "UFC";
+const photoSearch = q => `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(q)}`;
 function openCat(k){
   const c = (window.__CATS||[]).find(x=>x.k===k); if(!c) return;
   window.__OPEN = k;
   const m = $("modal");
   $("modal-title").textContent = c.s; $("modal-head").hidden = true;
   let body;
-  if(c.notes) body = c.notes.map(n=>`<li><span class="mk">${n.k}</span><span>${n.t}</span></li>`).join("");
+  if(c.weighin){
+    const ev = eventName(); const src = WEIGHINS && WEIGHINS.source;
+    body = `<li class="flinks"><a href="${photoSearch(ev+" weigh-ins")}" target="_blank" rel="noopener">All ${esc(ev)} weigh-in photos ↗</a>${src?`<a href="${src.url}" target="_blank" rel="noopener">${esc(src.label)} ↗</a>`:""}<a href="https://www.ufc.com/news" target="_blank" rel="noopener">UFC.com news and galleries ↗</a></li>` +
+      FIGHTS.map(f=>{
+        const wr = weightOf(f.red), wb = weightOf(f.blue);
+        const tag = c2 => f.missedWeight===c2 ? ' <em>Missed weight</em>' : "";
+        return `<li class="mf"><div class="mh">${esc(f.red)} <span class="mm">${wr??"—"} lbs</span>${tag("red")} vs. ${esc(f.blue)} <span class="mm">${wb??"—"} lbs</span>${tag("blue")}</div><div class="ms">${esc(f.title)}</div><div class="flinks"><a href="${photoSearch(f.red+" "+f.blue+" "+ev+" weigh-in")}" target="_blank" rel="noopener">Weigh-in and face-off photos ↗</a></div></li>`;
+      }).join("");
+  } else if(c.notes) body = c.notes.map(n=>`<li><span class="mk">${n.k}</span><span>${n.t}</span></li>`).join("");
   else body = c.list.map(f=>{
     const loser = f.winner==="red" ? f.blue : f.red;
     const head = f.status!=="final" ? `${f.red} vs. ${f.blue} <em>${f.status==="live"?"Live":"Upcoming"}</em>`
@@ -489,6 +516,7 @@ function render(){
     {k:"retire", b:FIGHTS.filter(f=>f.retire).length, s:"Retirements", list:FIGHTS.filter(f=>f.retire), sub:f=>f.note||""},
     {k:"title", b:FIGHTS.filter(f=>/title/i.test(f.title)).length, s:"Title fights", list:FIGHTS.filter(f=>/title/i.test(f.title)), sub:f=>`${f.title}${f.odds?" · "+oddsLine(f):""}`},
   ];
+  CATS.push({k:"weighin", b:FIGHTS.length?Object.keys(WEIGHINS||{}).filter(k=>k!=="source").length||"View":"—", s:"Weigh-ins", weighin:true});
   if(NOTES.length) CATS.push({k:"notes", b:NOTES.length, s:"Notable moments", notes:NOTES});
   if(BONUSES.length) CATS.push({k:"bonus", b:BONUSES.filter(x=>!/Announced after/.test(x.t)).length||"TBA", s:"Bonuses", notes:BONUSES});
   window.__CATS = CATS;
