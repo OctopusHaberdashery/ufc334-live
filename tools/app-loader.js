@@ -18,9 +18,11 @@ async function getJSON(u, bust){ const r=await fetch(bust?u+(u.includes("?")?"&"
 
 const SEG = {main:"main", prelims1:"prelims", prelims2:"early"};
 const pair = (v) => { if(v==null) return null; const m=String(v).match(/^(\d+)/); return m?+m[1]:null; };
-function statsOf(comp){
+// cs must be the competitors already sorted into red (order 1), blue (order 2).
+// ESPN's competitors array is NOT in corner order, so never index it directly.
+function statsOf(cs){
   const g = c => Object.fromEntries((c.stats||[]).map(x=>[x.name,x.displayValue]));
-  const a=g(comp.competitors[0]), b=g(comp.competitors[1]);
+  const a=g(cs[0]), b=g(cs[1]);
   if(!("sigStrikes" in a)) return null;               // pre-fight feeds carry career averages instead
   return {sig:[pair(a.sigStrikes),pair(b.sigStrikes)], td:[pair(a.takedowns),pair(b.takedowns)],
           tot:[pair(a.totalStrikes),pair(b.totalStrikes)], kd:[pair(a.knockDowns),pair(b.knockDowns)],
@@ -90,7 +92,7 @@ async function fromESPN(fc, ov){
       const fav = (f.odds.red!=null && f.odds.red<0) ? "red" : (f.odds.blue!=null && f.odds.blue<0) ? "blue" : null;
       if(fav && fav!==f.winner) f.upset = true;
     }
-    const s = statsOf(c); if(s) stats[f.red+"-"+f.blue] = s;
+    const s = statsOf(cs); if(s) stats[f.red+"-"+f.blue] = s;
     if(f.status==="live" && !live){
       live = {fight:f, detail: ty.description==="In Progress" || ty.state==="in" && st.period>0 ? `Round ${st.period}${st.displayClock&&st.displayClock!=="-"?" · "+st.displayClock:""}` : (ty.description||"Live"), stats:s};
       const lk = ov && ov.LIVE && ov.LIVE.key ? ov.LIVE.key.split("-") : null;

@@ -362,7 +362,9 @@ function openCat(k){
       : f.draw ? `${f.red} and ${f.blue} <em>Draw</em>` : `<b>${f[f.winner]}</b> def. ${loser}`;
     const how = f.status==="final" ? `${f.method} · R${f.round} ${f.time}${f.scores?` · ${f.scores}`:""}` : "";
     const st = STATS[f.red+"-"+f.blue];
-    const stl = st && st.sig ? `Sig. strikes ${st.sig[0]}-${st.sig[1]} · Takedowns ${st.td[0]}-${st.td[1]}${st.kd&&(st.kd[0]||st.kd[1])?` · Knockdowns ${st.kd[0]}-${st.kd[1]}`:""}` : "";
+    const [i,j] = f.winner==="blue" ? [1,0] : [0,1];
+    const who = f.status==="final" && !f.draw ? `${f[f.winner].split(" ").slice(-1)[0]} first` : `${f.red.split(" ").slice(-1)[0]} first`;
+    const stl = st && st.sig ? `Sig. strikes ${st.sig[i]}-${st.sig[j]} · Takedowns ${st.td[i]}-${st.td[j]}${st.kd&&(st.kd[0]||st.kd[1])?` · Knockdowns ${st.kd[i]}-${st.kd[j]}`:""} (${who})` : "";
     const sub = c.sub ? c.sub(f) : "";
     return `<li class="mf"><div class="mh">${head}</div>${how?`<div class="mm">${how}</div>`:""}${stl?`<div class="mm">${stl}</div>`:""}${sub&&sub!==how?`<div class="ms">${sub}</div>`:""}</li>`;
   }).join("");
