@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-15T03:53:11Z",
+ "updated": "2026-11-15T11:50:34Z",
  "events": [
   {
    "id": "600062902",
@@ -68,7 +68,7 @@
    "id": "600061400",
    "name": "UFC 334: Gane vs. Hokit",
    "date": "2026-11-14T22:00Z",
-   "state": "in",
+   "state": "post",
    "venue": "Madison Square Garden"
   },
   {
