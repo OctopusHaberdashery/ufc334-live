@@ -157,7 +157,7 @@ async function showEvent(id){
     const m = await fromESPN(fc, ov);
     FIGHTS = m.fights; STATS = m.stats; LIVE_STATE = m.state;
     LIVE = m.live ? {key:"", round:m.live.detail, rounds:m.live.rounds, stats:m.live.stats, plays:m.live.plays, ctrlRounds:m.live.ctrlRounds||{}} : {round:"",rounds:[]};
-    name = fc.event.name; venue = fc.venue && fc.venue.displayNameLocation; date = fc.event.date;
+    name = fc.event.name; venue = fc.venue && fc.venue.displayNameLocation; date = fc.event.date; CUR_DATE = date;
   } else {
     FIGHTS = ov.FIGHTS; STATS = ov.STATS||{}; LIVE = ov.LIVE; name = "UFC 334: Gane vs. Hokit"; venue = "Madison Square Garden, New York, NY"; date = "2026-11-14T22:00Z";
   }
@@ -178,7 +178,7 @@ async function showEvent(id){
   document.getElementById("bonuses").parentElement.hidden = !BONUSES.length;
   document.querySelector("section.two").hidden = !NOTES.length && !BONUSES.length;
   document.getElementById("odds").closest("section").hidden = !FIGHTS.some(f=>f.odds);
-  document.getElementById("sync").textContent = LIVE_STATE==="in" ? "Live, refreshing every 20s" : "Auto-refresh on";
+  document.getElementById("sync").innerHTML = LIVE_STATE==="in" ? "Live, refreshing every 20s" : 'Auto-refresh off · <button type="button" id="refresh-btn" class="rbtn">Refresh</button>';
 }
 
 function pickDefault(){
@@ -198,8 +198,18 @@ function fillPicker(){
   if(!INDEX.events.some(e=>e.id===CUR)) sel.insertAdjacentHTML("afterbegin",`<option value="${CUR}">${document.title}</option>`);
   sel.value = CUR; sel.hidden=false;
 }
-function schedule(){ clearTimeout(TIMER); TIMER = setTimeout(()=>refresh(), LIVE_STATE==="in" ? 20000 : 120000); }
+// Poll only while the event on screen is live. Otherwise stay quiet, except one wake-up when an
+// upcoming event is due to start within the next 12 hours, so a card that goes live while the app is open is picked up.
+let CUR_DATE = null, LAST_LOAD = 0;
+function schedule(){
+  clearTimeout(TIMER); TIMER = null;
+  if(LIVE_STATE==="in"){ TIMER = setTimeout(()=>refresh(), 20000); return; }
+  const start = CUR_DATE ? new Date(CUR_DATE).getTime() : NaN, wait = start - Date.now();
+  if(LIVE_STATE==="pre" && wait > 0 && wait < 12*36e5) TIMER = setTimeout(()=>refresh(), wait + 60000);
+  else if(LIVE_STATE==="pre" && wait <= 0 && wait > -6*36e5) TIMER = setTimeout(()=>refresh(), 120000); // start time passed but not marked live yet
+}
 async function refresh(){
+  LAST_LOAD = Date.now();
   try{ await showEvent(CUR); }catch(e){ document.getElementById("sync").textContent="Offline, showing last loaded results"; }
   schedule();
 }
@@ -221,6 +231,8 @@ async function boot(){
 }
 document.getElementById("evpick").addEventListener("change", e=>{ location.hash="e-"+e.target.value; });
 window.addEventListener("hashchange", ()=>{ const h=location.hash.replace(/^#e-/,""); if(h && h!==CUR){ CUR=h; refresh().then(fillPicker); } });
-document.addEventListener("visibilitychange",()=>{ if(!document.hidden) refresh(); });
+// Reopening the app reloads once if the data is stale (always during a live event).
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden && (LIVE_STATE==="in" || Date.now()-LAST_LOAD > 10*60000)) refresh(); });
+document.addEventListener("click", e=>{ if(e.target.closest("#refresh-btn")){ document.getElementById("sync").textContent="Refreshing…"; refresh(); } });
 boot();
 if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
