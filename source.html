@@ -245,13 +245,13 @@ a{color:var(--blue)}
 
 <script>
 /* ===== DATA: edit here to update the page ===== */
-const UPDATED = "11:21 PM ET";
+const UPDATED = "12:02 AM ET";
 const FIGHTS = [
   // seg: main | prelims | early ; status: final | live | next
-  {seg:"main", title:"Heavyweight title", red:"Ciryl Gane", redTag:"(c)", rec:["14-2","10-0"], blue:"Josh Hokit", odds:{red:-230, blue:190}, status:"next",
+  {seg:"main", title:"Heavyweight title", red:"Ciryl Gane", redTag:"(c)", rec:["14-2","10-0"], blue:"Josh Hokit", odds:{red:-230, blue:190}, status:"live",
     note:"Gane's first title defense. Hokit is unbeaten."},
-  {seg:"main", title:"Women's bantamweight title", red:"Kayla Harrison", redTag:"(c)", rec:["19-1","23-5"], blue:"Amanda Nunes", odds:{red:-166, blue:140}, status:"live",
-    note:"Nunes returns from about 41 months of retirement. Harrison returns from neck surgery."},
+  {seg:"main", title:"Women's bantamweight title", red:"Kayla Harrison", redTag:"(c)", rec:["19-1","23-5"], blue:"Amanda Nunes", odds:{red:-166, blue:140}, status:"final", winner:"red", method:"Submission", round:"?", time:"(late)", finish:true,
+    note:"Harrison retains the title, submitting Nunes late after dominating, per MMA Mania. Exact round and time to be confirmed. Live odds had swung toward Nunes early, with Harrison drifting from -166 to -125."},
   {seg:"main", title:"Middleweight", red:"Caio Borralho", blue:"Yousri Belgaroui", rec:["18-2","11-3"], odds:{red:-162, blue:136}, status:"final", winner:"red", method:"Decision (unanimous)", round:3, time:"5:00", scores:"30-27 x3",
     note:"Borralho won every round on the mat: a back take with a body triangle and choke attempts in R1, two takedowns and elbows from side control in R2, and two more takedowns in R3."},
   {seg:"main", title:"Welterweight", red:"Uros Medic", blue:"Kevin Holland", odds:{red:-164, blue:138}, status:"final", draw:true,
@@ -308,9 +308,9 @@ const FIGHTERS = {
 const slug = n => n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z ]/g,"").trim().replace(/ +/g,"-");
 const initials = n => n.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
 const LIVE = {
-  key:"Kayla Harrison-Amanda Nunes", round:"Underway",
+  key:"Ciryl Gane-Josh Hokit", round:"Main event underway",
   rounds:[
-    {r:"Pre", t:"Five-round title fight. Harrison (c) is -166, Nunes +140. Nunes returns from about 41 months of retirement; Harrison from neck surgery."},
+    {r:"Pre", t:"Five-round heavyweight title fight. Gane (c) is -230, unbeaten Hokit (HW #5) +190. Gane's first title defense."},
   ],
   stats:null,
 };
@@ -323,6 +323,7 @@ const NOTES = [
   {k:"Callout", t:"Bia Mesquita asked for a title shot after choking out Macy Chiasson in R1."},
   {k:"Draw", t:"Uros Medic and Kevin Holland fought to a majority draw (29-27 Medic, 28-28, 28-28). Medic had a point taken in R2 for a second low blow, so without it he would have won."},
   {k:"Dominant", t:"Caio Borralho (MW #6) swept Yousri Belgaroui 30-27 on all cards with takedowns and control in every round."},
+  {k:"Title retained", t:"Kayla Harrison submitted Amanda Nunes late to keep the women's bantamweight title in a clash of two legends."},
   {k:"Comebacks", t:"Amanda Nunes returns from retirement to face Kayla Harrison, who is back from neck surgery."},
 ];
 const BONUSES = [

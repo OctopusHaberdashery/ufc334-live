@@ -1,5 +1,5 @@
 {
- "UPDATED": "11:21 PM ET",
+ "UPDATED": "12:02 AM ET",
  "FIGHTS": [
   {
    "seg": "main",
@@ -15,7 +15,7 @@
     "red": -230,
     "blue": 190
    },
-   "status": "next",
+   "status": "live",
    "note": "Gane's first title defense. Hokit is unbeaten."
   },
   {
@@ -32,8 +32,13 @@
     "red": -166,
     "blue": 140
    },
-   "status": "live",
-   "note": "Nunes returns from about 41 months of retirement. Harrison returns from neck surgery."
+   "status": "final",
+   "winner": "red",
+   "method": "Submission",
+   "round": "?",
+   "time": "(late)",
+   "finish": true,
+   "note": "Harrison retains the title, submitting Nunes late after dominating, per MMA Mania. Exact round and time to be confirmed. Live odds had swung toward Nunes early, with Harrison drifting from -166 to -125."
   },
   {
    "seg": "main",
@@ -314,12 +319,12 @@
   }
  },
  "LIVE": {
-  "key": "Kayla Harrison-Amanda Nunes",
-  "round": "Underway",
+  "key": "Ciryl Gane-Josh Hokit",
+  "round": "Main event underway",
   "rounds": [
    {
     "r": "Pre",
-    "t": "Five-round title fight. Harrison (c) is -166, Nunes +140. Nunes returns from about 41 months of retirement; Harrison from neck surgery."
+    "t": "Five-round heavyweight title fight. Gane (c) is -230, unbeaten Hokit (HW #5) +190. Gane's first title defense."
    }
   ],
   "stats": null
@@ -356,6 +361,10 @@
   {
    "k": "Dominant",
    "t": "Caio Borralho (MW #6) swept Yousri Belgaroui 30-27 on all cards with takedowns and control in every round."
+  },
+  {
+   "k": "Title retained",
+   "t": "Kayla Harrison submitted Amanda Nunes late to keep the women's bantamweight title in a clash of two legends."
   },
   {
    "k": "Comebacks",
