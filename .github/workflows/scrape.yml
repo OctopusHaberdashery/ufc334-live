@@ -22,7 +22,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install requests==2.32.3 beautifulsoup4==4.12.3
-      - run: python scraper/scrape.py
+      - run: python scraper/probe.py
+      - run: python scraper/scrape.py || true
       - name: Commit changes
         run: |
           git config user.name "ufc-tracker-bot"
