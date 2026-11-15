@@ -180,15 +180,17 @@ a{color:var(--blue)}
 
 <script>
 /* ===== DATA: edit here to update the page ===== */
-const UPDATED = "10:36 PM ET";
+const UPDATED = "10:48 PM ET";
 const FIGHTS = [
   // seg: main | prelims | early ; status: final | live | next
   {seg:"main", title:"Heavyweight title", red:"Ciryl Gane", redTag:"(c)", rec:["14-2","10-0"], blue:"Josh Hokit", odds:{red:-230, blue:190}, status:"next",
     note:"Gane's first title defense. Hokit is unbeaten."},
   {seg:"main", title:"Women's bantamweight title", red:"Kayla Harrison", redTag:"(c)", rec:["19-1","23-5"], blue:"Amanda Nunes", odds:{red:-166, blue:140}, status:"next",
     note:"Nunes returns from about 41 months of retirement. Harrison returns from neck surgery."},
-  {seg:"main", title:"Middleweight", red:"Caio Borralho", blue:"Yousri Belgaroui", rec:["18-2","11-3"], odds:{red:-162, blue:136}, status:"next"},
-  {seg:"main", title:"Welterweight", red:"Uros Medic", blue:"Kevin Holland", odds:{red:-164, blue:138}, status:"live"},
+  {seg:"main", title:"Middleweight", red:"Caio Borralho", blue:"Yousri Belgaroui", rec:["18-2","11-3"], odds:{red:-162, blue:136}, status:"live"},
+  {seg:"main", title:"Welterweight", red:"Uros Medic", blue:"Kevin Holland", odds:{red:-164, blue:138}, status:"final", draw:true,
+    method:"Majority draw", round:3, time:"5:00",
+    note:"Holland won R1 with uppercuts, a trip and two ninja choke attempts. Medic appeared to hurt his left knee early in R2, and R2 was paused for a Medic groin kick. Scorecards not yet confirmed."},
   {seg:"main", title:"Flyweight", red:"Luis Gurule", blue:"Bilal Hasan", odds:{red:675, blue:-1050}, status:"final", winner:"red",
     method:"Decision (split)", round:3, time:"5:00", upset:true, scores:"29-28, 29-28, 28-29",
     note:"Biggest upset of the night. Gurule dropped the unbeaten Hasan in R1, took him down in R2 and R3, and cut him with an elbow in R3."},
@@ -240,10 +242,9 @@ const FIGHTERS = {
 const slug = n => n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z ]/g,"").trim().replace(/ +/g,"-");
 const initials = n => n.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase();
 const LIVE = {
-  key:"Uros Medic-Kevin Holland", round:"Round 2 underway",
+  key:"Caio Borralho-Yousri Belgaroui", round:"Walkouts / Round 1",
   rounds:[
-    {r:"R1", t:"Holland lands uppercuts, scores a trip takedown and attacks two ninja chokes. MMA Fighting scores it 10-9 Holland."},
-    {r:"R2", t:"Medic looks to be favoring his left knee early. Action is paused after Medic lands a groin kick."},
+    {r:"Pre", t:"Borralho (MW #6) is a -162 favorite. Belgaroui is unranked at +136."},
   ],
   stats:null,
 };
@@ -254,7 +255,7 @@ const NOTES = [
   {k:"Missed weight", t:"Terrance McKinney (160.2 for lightweight) missed by more than 4 lbs, then stopped Jim Miller in 1:53."},
   {k:"Missed weight", t:"Juan Diaz (136.4 for bantamweight) missed and still beat short-notice replacement Alateng Heili."},
   {k:"Callout", t:"Bia Mesquita asked for a title shot after choking out Macy Chiasson in R1."},
-  {k:"Injury watch", t:"Uros Medic may be hurt. He was favoring his left knee in R2 against Kevin Holland."},
+  {k:"Draw", t:"Uros Medic and Kevin Holland fought to a majority draw. Medic was favoring his left knee from early in R2."},
   {k:"Comebacks", t:"Amanda Nunes returns from retirement to face Kayla Harrison, who is back from neck surgery."},
 ];
 const BONUSES = [
@@ -285,12 +286,13 @@ function fightCard(f){
   const pill = f.status==="final"?'<span class="pill final">Final</span>':f.status==="live"?'<span class="pill live">Live</span>':'<span class="pill next">Upcoming</span>';
   const tags = [];
   if(f.title.includes("title")) tags.push('<span class="tag title">Title</span>');
+  if(f.draw) tags.push('<span class="tag upset">Draw</span>');
   if(f.upset) tags.push('<span class="tag upset">Upset</span>');
   if(f.finish) tags.push('<span class="tag fin">Finish</span>');
   if(f.retire) tags.push('<span class="tag ret">Retirement</span>');
   if(f.missedWeight) tags.push('<span class="tag weight">Missed weight</span>');
   const side = (c)=>{
-    const nm=f[c], cls = f.status==="final" ? (f.winner===c?"w":"l") : "";
+    const nm=f[c], cls = f.status==="final" && !f.draw ? (f.winner===c?"w":"l") : "";
     const o = f.odds ? fmtOdds(f.odds[c]) : "—";
     const t = c==="red" && f.redTag ? " "+f.redTag : "";
     const mw = f.missedWeight===c ? " · missed weight" : ""; const rc = f.rec ? f.rec[c==="red"?0:1]+" · " : "";
@@ -301,7 +303,7 @@ function fightCard(f){
   };
   let res = "";
   if(f.status==="final"){
-    const w = f[f.winner];
+    const w = f.draw ? "Draw" : f[f.winner];
     res = `<div class="fr"><span class="res">${w} · ${f.method} · R${f.round} ${f.time}${f.scores?` (${f.scores})`:""}</span>${f.note?`<span class="note">${f.note}</span>`:""}</div>`;
   } else if(f.status==="live"){
     res = `<div class="fr"><span class="res">${LIVE.round}</span><span class="note">Round-by-round notes are in the live panel above.</span></div>`;
@@ -322,11 +324,11 @@ function render(){
   const ko = done.filter(f=>/KO/.test(f.method));
   const sub = done.filter(f=>/Submission/.test(f.method));
   const dec = done.filter(f=>/Decision/.test(f.method));
-  const withFav = done.filter(f=>favOf(f));
+  const withFav = done.filter(f=>favOf(f) && !f.draw);
   const favWins = withFav.filter(f=>favOf(f)===f.winner);
   $("strip").innerHTML = [
     [`${done.length}/${FIGHTS.length}`,"Fights complete"],
-    [ko.length,"KO / TKO"],[sub.length,"Submissions"],[dec.length,"Decisions"],
+    [ko.length,"KO / TKO"],[sub.length,"Submissions"],[dec.length,"Decisions"],[done.filter(f=>f.draw).length,"Draws"],
     [withFav.length?`${favWins.length}-${withFav.length-favWins.length}`:"—","Favorites W-L"],
     [FIGHTS.filter(f=>f.missedWeight).length,"Missed weight"],
   ].map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
@@ -353,7 +355,8 @@ function render(){
   const rows = FIGHTS.map(f=>{
     const fav = favOf(f); const dog = fav==="red"?"blue":"red";
     let result="—", cls="";
-    if(f.status==="final" && fav){ const ok=f.winner===fav; result= ok?"Favorite won":"Underdog won"; cls= ok?"ok":"no"; }
+    if(f.status==="final" && f.draw){ result="Draw"; }
+    else if(f.status==="final" && fav){ const ok=f.winner===fav; result= ok?"Favorite won":"Underdog won"; cls= ok?"ok":"no"; }
     else if(f.status==="final") result = `${f[f.winner]} won · line not posted`;
     else if(f.status==="live") result="In progress"; else result="Upcoming";
     const pair = fav ? `${f[fav]} ${fmtOdds(f.odds[fav])} / ${f[dog]} ${fmtOdds(f.odds[dog])}` : `${f.red} / ${f.blue}`;

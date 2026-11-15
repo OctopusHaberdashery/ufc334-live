@@ -220,12 +220,13 @@ function fightCard(f){
   const pill = f.status==="final"?'<span class="pill final">Final</span>':f.status==="live"?'<span class="pill live">Live</span>':'<span class="pill next">Upcoming</span>';
   const tags = [];
   if(f.title.includes("title")) tags.push('<span class="tag title">Title</span>');
+  if(f.draw) tags.push('<span class="tag upset">Draw</span>');
   if(f.upset) tags.push('<span class="tag upset">Upset</span>');
   if(f.finish) tags.push('<span class="tag fin">Finish</span>');
   if(f.retire) tags.push('<span class="tag ret">Retirement</span>');
   if(f.missedWeight) tags.push('<span class="tag weight">Missed weight</span>');
   const side = (c)=>{
-    const nm=f[c], cls = f.status==="final" ? (f.winner===c?"w":"l") : "";
+    const nm=f[c], cls = f.status==="final" && !f.draw ? (f.winner===c?"w":"l") : "";
     const o = f.odds ? fmtOdds(f.odds[c]) : "—";
     const t = c==="red" && f.redTag ? " "+f.redTag : "";
     const mw = f.missedWeight===c ? " · missed weight" : ""; const rc = f.rec ? f.rec[c==="red"?0:1]+" · " : "";
@@ -236,7 +237,7 @@ function fightCard(f){
   };
   let res = "";
   if(f.status==="final"){
-    const w = f[f.winner];
+    const w = f.draw ? "Draw" : f[f.winner];
     res = `<div class="fr"><span class="res">${w} · ${f.method} · R${f.round} ${f.time}${f.scores?` (${f.scores})`:""}</span>${f.note?`<span class="note">${f.note}</span>`:""}</div>`;
   } else if(f.status==="live"){
     res = `<div class="fr"><span class="res">${LIVE.round}</span><span class="note">Round-by-round notes are in the live panel above.</span></div>`;
@@ -257,11 +258,11 @@ function render(){
   const ko = done.filter(f=>/KO/.test(f.method));
   const sub = done.filter(f=>/Submission/.test(f.method));
   const dec = done.filter(f=>/Decision/.test(f.method));
-  const withFav = done.filter(f=>favOf(f));
+  const withFav = done.filter(f=>favOf(f) && !f.draw);
   const favWins = withFav.filter(f=>favOf(f)===f.winner);
   $("strip").innerHTML = [
     [`${done.length}/${FIGHTS.length}`,"Fights complete"],
-    [ko.length,"KO / TKO"],[sub.length,"Submissions"],[dec.length,"Decisions"],
+    [ko.length,"KO / TKO"],[sub.length,"Submissions"],[dec.length,"Decisions"],[done.filter(f=>f.draw).length,"Draws"],
     [withFav.length?`${favWins.length}-${withFav.length-favWins.length}`:"—","Favorites W-L"],
     [FIGHTS.filter(f=>f.missedWeight).length,"Missed weight"],
   ].map(([b,s])=>`<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
@@ -288,7 +289,8 @@ function render(){
   const rows = FIGHTS.map(f=>{
     const fav = favOf(f); const dog = fav==="red"?"blue":"red";
     let result="—", cls="";
-    if(f.status==="final" && fav){ const ok=f.winner===fav; result= ok?"Favorite won":"Underdog won"; cls= ok?"ok":"no"; }
+    if(f.status==="final" && f.draw){ result="Draw"; }
+    else if(f.status==="final" && fav){ const ok=f.winner===fav; result= ok?"Favorite won":"Underdog won"; cls= ok?"ok":"no"; }
     else if(f.status==="final") result = `${f[f.winner]} won · line not posted`;
     else if(f.status==="live") result="In progress"; else result="Upcoming";
     const pair = fav ? `${f[fav]} ${fmtOdds(f.odds[fav])} / ${f[dog]} ${fmtOdds(f.odds[dog])}` : `${f.red} / ${f.blue}`;
