@@ -1,5 +1,5 @@
 {
- "UPDATED": "1:02 AM ET",
+ "UPDATED": "1:22 AM ET (final)",
  "FIGHTS": [
   {
    "seg": "main",
@@ -401,15 +401,23 @@
  "BONUSES": [
   {
    "k": "Fight of the Night",
-   "t": "Announced after the main event."
+   "t": "Ciryl Gane vs. Josh Hokit ($100,000 each)"
   },
   {
    "k": "Performance",
-   "t": "Announced after the main event."
+   "t": "Kayla Harrison, R4 rear-naked choke of Amanda Nunes ($100,000)"
   },
   {
    "k": "Performance",
-   "t": "Announced after the main event."
+   "t": "Stephen Thompson, spinning wheel kick TKO in his retirement fight ($100,000)"
+  },
+  {
+   "k": "Finish bonus",
+   "t": "Bia Mesquita, R1 rear-naked choke ($25,000). McKinney and Almeida were not eligible because of weight issues."
+  },
+  {
+   "k": "Source",
+   "t": "Per Heavy.com. One outlet reports four Performance bonuses, so this may change when UFC.com posts the official list."
   }
  ],
  "WEIGHINS": {
