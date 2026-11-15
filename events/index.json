@@ -1,0 +1,782 @@
+{
+ "updated": "2026-11-15T03:53:11Z",
+ "events": [
+  {
+   "id": "600062902",
+   "name": "UFC 337",
+   "date": "2027-02-20T23:00Z",
+   "state": "pre",
+   "venue": "Kia Center"
+  },
+  {
+   "id": "600062901",
+   "name": "UFC Fight Night: Pyfer vs. Nickal",
+   "date": "2027-02-13T23:00Z",
+   "state": "pre",
+   "venue": "Rocket Arena"
+  },
+  {
+   "id": "600062420",
+   "name": "UFC Fight Night: Salkilld vs. Saint Denis",
+   "date": "2027-02-06T19:00Z",
+   "state": "pre",
+   "venue": "Afterpay Arena"
+  },
+  {
+   "id": "600062191",
+   "name": "UFC 336: Van vs. Kape",
+   "date": "2027-01-30T23:00Z",
+   "state": "pre",
+   "venue": "Scotiabank Arena"
+  },
+  {
+   "id": "600062900",
+   "name": "UFC Fight Night: Bonfim vs. Brady",
+   "date": "2027-01-23T23:00Z",
+   "state": "pre",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600062421",
+   "name": "UFC Fight Night: Rodriguez vs. Garcia",
+   "date": "2027-01-16T23:00Z",
+   "state": "pre",
+   "venue": "American Airlines Center"
+  },
+  {
+   "id": "600061401",
+   "name": "UFC 335: Oliveira vs. Lopes",
+   "date": "2026-12-12T22:00Z",
+   "state": "pre",
+   "venue": "T-Mobile Arena"
+  },
+  {
+   "id": "600062700",
+   "name": "UFC Fight Night: Adesanya vs Magomedov",
+   "date": "2026-12-05T15:00Z",
+   "state": "pre",
+   "venue": "ANB Arena"
+  },
+  {
+   "id": "600061665",
+   "name": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
+   "date": "2026-11-21T15:00Z",
+   "state": "pre",
+   "venue": "ABHA Arena"
+  },
+  {
+   "id": "600061400",
+   "name": "UFC 334: Gane vs. Hokit",
+   "date": "2026-11-14T22:00Z",
+   "state": "in",
+   "venue": "Madison Square Garden"
+  },
+  {
+   "id": "600061268",
+   "name": "UFC Fight Night: Cortes Acosta vs. Walker",
+   "date": "2026-11-07T22:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600061420",
+   "name": "UFC Fight Night: Moicano vs. Nolan",
+   "date": "2026-10-31T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600061267",
+   "name": "UFC 333: Volkanovski vs. Evloev",
+   "date": "2026-10-24T14:00Z",
+   "state": "post",
+   "venue": "Etihad Arena"
+  },
+  {
+   "id": "600060773",
+   "name": "UFC Fight Night: Buckley vs. Malott",
+   "date": "2026-10-17T21:00Z",
+   "state": "post",
+   "venue": "Rogers Place"
+  },
+  {
+   "id": "600060741",
+   "name": "Dana White's Contender Series: Season 10, Week 10",
+   "date": "2026-10-13T23:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600061541",
+   "name": "UFC Fight Night: Allen vs. Duncan",
+   "date": "2026-10-10T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600060740",
+   "name": "Dana White's Contender Series: Season 10, Week 9",
+   "date": "2026-10-06T23:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600061182",
+   "name": "UFC 332: Silva vs. Wang",
+   "date": "2026-10-03T20:00Z",
+   "state": "post",
+   "venue": "Delta Center"
+  },
+  {
+   "id": "600060739",
+   "name": "Dana White's Contender Series: Season 10, Week 8",
+   "date": "2026-09-29T23:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600061266",
+   "name": "UFC Fight Night: Rosas Jr. vs. Barcelos",
+   "date": "2026-09-26T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600060738",
+   "name": "Dana White's Contender Series: Season 10, Week 7",
+   "date": "2026-09-22T23:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600060963",
+   "name": "UFC 331: Van vs. Pantoja 2",
+   "date": "2026-09-19T21:00Z",
+   "state": "post",
+   "venue": "crypto.com Arena"
+  },
+  {
+   "id": "600060737",
+   "name": "Dana White's Contender Series: Season 10, Week 6",
+   "date": "2026-09-15T23:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600060772",
+   "name": "Noche UFC: Silva vs. Delgado",
+   "date": "2026-09-12T18:00Z",
+   "state": "post",
+   "venue": "Desert Diamond Arena"
+  },
+  {
+   "id": "600060736",
+   "name": "Dana White's Contender Series: Season 10, Week 5",
+   "date": "2026-09-08T23:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600059993",
+   "name": "UFC Fight Night: Hooker vs. Parnasse",
+   "date": "2026-09-05T16:00Z",
+   "state": "post",
+   "venue": "Accor Arena"
+  },
+  {
+   "id": "600060735",
+   "name": "Dana White's Contender Series: Season 10, Week 4",
+   "date": "2026-09-01T23:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600060620",
+   "name": "UFC Fight Night: Nurmagomedov vs. Song",
+   "date": "2026-08-29T07:00Z",
+   "state": "post",
+   "venue": "Shanghai Oriental Sports Center"
+  },
+  {
+   "id": "600060734",
+   "name": "Dana White's Contender Series: Season 10, Week 3",
+   "date": "2026-08-25T23:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600060493",
+   "name": "UFC Fight Night: Hernandez vs. Rodrigues",
+   "date": "2026-08-22T21:00Z",
+   "state": "post",
+   "venue": "Golden 1 Center"
+  },
+  {
+   "id": "600060733",
+   "name": "Dana White's Contender Series: Season 10, Week 2",
+   "date": "2026-08-18T23:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600059185",
+   "name": "UFC 330: Makhachev vs. Machado Garry",
+   "date": "2026-08-15T21:30Z",
+   "state": "post",
+   "venue": "Xfinity Mobile Arena"
+  },
+  {
+   "id": "600060732",
+   "name": "Dana White's Contender Series: Season 10, Week 1",
+   "date": "2026-08-11T23:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600060621",
+   "name": "UFC Fight Night: Gamrot vs Salkilld",
+   "date": "2026-08-08T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600059339",
+   "name": "UFC Fight Night: Medi\u0107 vs. Rodriguez",
+   "date": "2026-08-01T14:00Z",
+   "state": "post",
+   "venue": "Belgrade Arena"
+  },
+  {
+   "id": "600059667",
+   "name": "UFC Fight Night: Ankalaev vs. Guskov",
+   "date": "2026-07-25T13:00Z",
+   "state": "post",
+   "venue": "Etihad Arena"
+  },
+  {
+   "id": "600059599",
+   "name": "UFC Fight Night: Du Plessis vs. Usman",
+   "date": "2026-07-18T21:00Z",
+   "state": "post",
+   "venue": "Paycom Center"
+  },
+  {
+   "id": "600059148",
+   "name": "UFC 329: McGregor vs. Holloway 2",
+   "date": "2026-07-11T21:00Z",
+   "state": "post",
+   "venue": "T-Mobile Arena"
+  },
+  {
+   "id": "600059254",
+   "name": "UFC Fight Night: Fiziev vs. Torres",
+   "date": "2026-06-27T13:00Z",
+   "state": "post",
+   "venue": "National Gymnastics Arena"
+  },
+  {
+   "id": "600059467",
+   "name": "UFC Fight Night: Kape vs. Horiguchi 2",
+   "date": "2026-06-20T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600058854",
+   "name": "UFC Freedom 250: Topuria vs. Gaethje",
+   "date": "2026-06-15T00:00Z",
+   "state": "post",
+   "venue": "South Lawn of the White House"
+  },
+  {
+   "id": "600058949",
+   "name": "UFC Fight Night: Muhammad vs. Bonfim",
+   "date": "2026-06-06T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600058517",
+   "name": "UFC Fight Night: Song vs. Figueiredo",
+   "date": "2026-05-30T08:00Z",
+   "state": "post",
+   "venue": "Galaxy Arena"
+  },
+  {
+   "id": "600058948",
+   "name": "UFC Fight Night: Allen vs. Costa",
+   "date": "2026-05-16T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600058947",
+   "name": "UFC 328: Chimaev vs. Strickland",
+   "date": "2026-05-09T21:00Z",
+   "state": "post",
+   "venue": "Prudential Center"
+  },
+  {
+   "id": "600058807",
+   "name": "UFC Fight Night: Della Maddalena vs. Prates",
+   "date": "2026-05-02T08:00Z",
+   "state": "post",
+   "venue": "RAC Arena (AUS)"
+  },
+  {
+   "id": "600058746",
+   "name": "UFC Fight Night: Sterling vs. Zalal",
+   "date": "2026-04-25T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600058725",
+   "name": "UFC Fight Night: Burns vs. Malott",
+   "date": "2026-04-18T21:00Z",
+   "state": "post",
+   "venue": "Canada Life Centre"
+  },
+  {
+   "id": "600058745",
+   "name": "UFC 327: Proch\u00e1zka vs. Ulberg",
+   "date": "2026-04-11T21:30Z",
+   "state": "post",
+   "venue": "Kaseya Center"
+  },
+  {
+   "id": "600058693",
+   "name": "UFC Fight Night: Moicano vs. Duncan",
+   "date": "2026-04-04T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600057366",
+   "name": "UFC Fight Night: Adesanya vs. Pyfer",
+   "date": "2026-03-28T21:00Z",
+   "state": "post",
+   "venue": "Climate Pledge Arena"
+  },
+  {
+   "id": "600057365",
+   "name": "UFC Fight Night: Evloev vs. Murphy",
+   "date": "2026-03-21T17:00Z",
+   "state": "post",
+   "venue": "O2 Arena (ENG)"
+  },
+  {
+   "id": "600057364",
+   "name": "UFC Fight Night: Emmett vs. Vallejos",
+   "date": "2026-03-14T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600057326",
+   "name": "UFC 326: Holloway vs. Oliveira 2",
+   "date": "2026-03-07T22:30Z",
+   "state": "post",
+   "venue": "T-Mobile Arena"
+  },
+  {
+   "id": "600057330",
+   "name": "UFC Fight Night: Moreno vs. Kavanagh",
+   "date": "2026-02-28T22:00Z",
+   "state": "post",
+   "venue": "Arena CDMX"
+  },
+  {
+   "id": "600057329",
+   "name": "UFC Fight Night: Strickland vs. Hernandez",
+   "date": "2026-02-21T22:00Z",
+   "state": "post",
+   "venue": "Toyota Center (Houston)"
+  },
+  {
+   "id": "600057328",
+   "name": "UFC Fight Night: Bautista vs. Oliveira",
+   "date": "2026-02-07T22:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600057025",
+   "name": "UFC 325: Volkanovski vs. Lopes 2",
+   "date": "2026-01-31T22:00Z",
+   "state": "post",
+   "venue": "Afterpay Arena"
+  },
+  {
+   "id": "600057024",
+   "name": "UFC 324: Gaethje vs. Pimblett",
+   "date": "2026-01-24T22:30Z",
+   "state": "post",
+   "venue": "T-Mobile Arena"
+  },
+  {
+   "id": "600056266",
+   "name": "UFC Fight Night: Royval vs. Kape",
+   "date": "2025-12-14T00:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600056375",
+   "name": "UFC 323: Dvalishvili vs. Yan 2",
+   "date": "2025-12-06T23:00Z",
+   "state": "post",
+   "venue": "T-Mobile Arena"
+  },
+  {
+   "id": "600055175",
+   "name": "UFC Fight Night: Tsarukyan vs. Hooker",
+   "date": "2025-11-22T15:00Z",
+   "state": "post",
+   "venue": "ABHA Arena"
+  },
+  {
+   "id": "600055729",
+   "name": "UFC 322: Della Maddalena vs. Makhachev",
+   "date": "2025-11-15T23:00Z",
+   "state": "post",
+   "venue": "Madison Square Garden"
+  },
+  {
+   "id": "600056160",
+   "name": "UFC Fight Night: Bonfim vs. Brown",
+   "date": "2025-11-08T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600056045",
+   "name": "UFC Fight Night: Garcia vs. Onama",
+   "date": "2025-11-01T20:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600055085",
+   "name": "UFC 321: Aspinall vs. Gane",
+   "date": "2025-10-25T14:00Z",
+   "state": "post",
+   "venue": "Etihad Arena"
+  },
+  {
+   "id": "600054482",
+   "name": "UFC Fight Night: de Ridder vs. Allen",
+   "date": "2025-10-18T20:00Z",
+   "state": "post",
+   "venue": "Rogers Arena"
+  },
+  {
+   "id": "600055055",
+   "name": "Dana White's Contender Series: Season 9, Week 10",
+   "date": "2025-10-15T00:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600055376",
+   "name": "UFC Fight Night: Oliveira vs. Gamrot",
+   "date": "2025-10-11T20:00Z",
+   "state": "post",
+   "venue": "Farmasi Arena"
+  },
+  {
+   "id": "600055054",
+   "name": "Dana White's Contender Series: Season 9, Week 9",
+   "date": "2025-10-08T00:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600054473",
+   "name": "UFC 320: Ankalaev vs. Pereira 2",
+   "date": "2025-10-04T22:00Z",
+   "state": "post",
+   "venue": "T-Mobile Arena"
+  },
+  {
+   "id": "600055033",
+   "name": "Dana White's Contender Series: Season 9, Week 8",
+   "date": "2025-10-01T00:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600055226",
+   "name": "UFC Fight Night: Ulberg vs. Reyes",
+   "date": "2025-09-27T23:00Z",
+   "state": "post",
+   "venue": "RAC Arena (AUS)"
+  },
+  {
+   "id": "600055032",
+   "name": "Dana White's Contender Series: Season 9, Week 7",
+   "date": "2025-09-24T00:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600055031",
+   "name": "Dana White's Contender Series: Season 9, Week 6",
+   "date": "2025-09-17T00:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600053664",
+   "name": "Noche UFC: Lopes vs. Silva",
+   "date": "2025-09-13T19:00Z",
+   "state": "post",
+   "venue": "Frost Bank Center"
+  },
+  {
+   "id": "600055007",
+   "name": "Dana White's Contender Series: Season 9, Week 5",
+   "date": "2025-09-10T00:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600054419",
+   "name": "UFC Fight Night: Imavov vs. Borralho",
+   "date": "2025-09-06T16:00Z",
+   "state": "post",
+   "venue": "Accor Arena"
+  },
+  {
+   "id": "600055006",
+   "name": "Dana White's Contender Series: Season 9, Week 4",
+   "date": "2025-09-03T00:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600055005",
+   "name": "Dana White's Contender Series: Season 9, Week 3",
+   "date": "2025-08-27T00:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600054141",
+   "name": "UFC Fight Night: Walker vs. Zhang",
+   "date": "2025-08-23T07:00Z",
+   "state": "post",
+   "venue": "Mercedes-Benz Arena"
+  },
+  {
+   "id": "600055021",
+   "name": "Dana White's Contender Series: Season 9, Week 2",
+   "date": "2025-08-20T00:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600054045",
+   "name": "UFC 319: Du Plessis vs. Chimaev",
+   "date": "2025-08-16T22:30Z",
+   "state": "post",
+   "venue": "United Center"
+  },
+  {
+   "id": "600055020",
+   "name": "Dana White's Contender Series: Season 9, Week 1",
+   "date": "2025-08-12T23:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600054396",
+   "name": "UFC Fight Night: Dolidze vs. Hernandez",
+   "date": "2025-08-09T20:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600054244",
+   "name": "UFC Fight Night: Taira vs. Park",
+   "date": "2025-08-02T22:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600053545",
+   "name": "UFC Fight Night: Whittaker vs. de Ridder",
+   "date": "2025-07-26T16:00Z",
+   "state": "post",
+   "venue": "Etihad Arena"
+  },
+  {
+   "id": "600053891",
+   "name": "UFC 318: Holloway vs. Poirier 3",
+   "date": "2025-07-19T22:00Z",
+   "state": "post",
+   "venue": "Smoothie King Center"
+  },
+  {
+   "id": "600054061",
+   "name": "UFC Fight Night: Lewis vs. Teixeira",
+   "date": "2025-07-12T22:00Z",
+   "state": "post",
+   "venue": "Bridgestone Arena"
+  },
+  {
+   "id": "600053168",
+   "name": "UFC 317: Topuria vs. Oliveira",
+   "date": "2025-06-28T23:00Z",
+   "state": "post",
+   "venue": "T-Mobile Arena"
+  },
+  {
+   "id": "600053795",
+   "name": "UFC Fight Night: Hill vs. Rountree Jr.",
+   "date": "2025-06-21T16:00Z",
+   "state": "post",
+   "venue": "Baku Crystal Hall"
+  },
+  {
+   "id": "600053732",
+   "name": "UFC Fight Night: Usman vs. Buckley",
+   "date": "2025-06-14T23:00Z",
+   "state": "post",
+   "venue": "State Farm Arena"
+  },
+  {
+   "id": "600053672",
+   "name": "UFC 316: Dvalishvili vs. O'Malley 2",
+   "date": "2025-06-07T22:00Z",
+   "state": "post",
+   "venue": "Prudential Center"
+  },
+  {
+   "id": "600053606",
+   "name": "UFC Fight Night: Blanchfield vs. Barber",
+   "date": "2025-05-31T22:30Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600053676",
+   "name": "UFC Fight Night: Burns vs. Morales",
+   "date": "2025-05-17T20:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600053073",
+   "name": "UFC 315: Muhammad vs. Della Maddalena",
+   "date": "2025-05-10T22:00Z",
+   "state": "post",
+   "venue": "Bell Centre"
+  },
+  {
+   "id": "600053455",
+   "name": "UFC Fight Night: Sandhagen vs. Figueiredo",
+   "date": "2025-05-03T23:00Z",
+   "state": "post",
+   "venue": "Wells Fargo Arena"
+  },
+  {
+   "id": "600053312",
+   "name": "UFC Fight Night: Machado Garry vs. Prates",
+   "date": "2025-04-26T22:00Z",
+   "state": "post",
+   "venue": "T-Mobile Center"
+  },
+  {
+   "id": "600053165",
+   "name": "UFC 314: Volkanovski vs. Lopes",
+   "date": "2025-04-12T22:00Z",
+   "state": "post",
+   "venue": "Kaseya Center"
+  },
+  {
+   "id": "600053226",
+   "name": "UFC Fight Night: Emmett vs. Murphy",
+   "date": "2025-04-05T22:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600051449",
+   "name": "UFC Fight Night: Moreno vs. Erceg",
+   "date": "2025-03-29T20:00Z",
+   "state": "post",
+   "venue": "Mexico City Arena"
+  },
+  {
+   "id": "600051194",
+   "name": "UFC Fight Night: Edwards vs. Brady",
+   "date": "2025-03-22T17:00Z",
+   "state": "post",
+   "venue": "O2 Arena (ENG)"
+  },
+  {
+   "id": "600051448",
+   "name": "UFC Fight Night: Vettori vs. Dolidze 2",
+   "date": "2025-03-15T20:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600051447",
+   "name": "UFC 313: Pereira vs. Ankalaev",
+   "date": "2025-03-08T23:00Z",
+   "state": "post",
+   "venue": "T-Mobile Arena"
+  },
+  {
+   "id": "600051446",
+   "name": "UFC Fight Night: Kape vs. Almabayev",
+   "date": "2025-03-01T21:30Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600051445",
+   "name": "UFC Fight Night: Cejudo vs. Song",
+   "date": "2025-02-22T23:00Z",
+   "state": "post",
+   "venue": "Climate Pledge Arena"
+  },
+  {
+   "id": "600051444",
+   "name": "UFC Fight Night: Cannonier vs. Rodrigues",
+   "date": "2025-02-15T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  },
+  {
+   "id": "600050481",
+   "name": "UFC 312: Du Plessis vs. Strickland 2",
+   "date": "2025-02-08T23:30Z",
+   "state": "post",
+   "venue": "Afterpay Arena"
+  },
+  {
+   "id": "600051443",
+   "name": "UFC Fight Night: Adesanya vs. Imavov",
+   "date": "2025-02-01T14:00Z",
+   "state": "post",
+   "venue": "ANB Arena"
+  },
+  {
+   "id": "600051442",
+   "name": "UFC 311: Makhachev vs. Moicano",
+   "date": "2025-01-18T23:00Z",
+   "state": "post",
+   "venue": "Intuit Dome"
+  },
+  {
+   "id": "600051441",
+   "name": "UFC Fight Night: Dern vs Ribas 2",
+   "date": "2025-01-11T21:00Z",
+   "state": "post",
+   "venue": "Meta APEX"
+  }
+ ]
+}
