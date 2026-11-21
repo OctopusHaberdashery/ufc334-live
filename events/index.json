@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-21T20:05:50Z",
+ "updated": "2026-11-21T23:59:38Z",
  "events": [
   {
    "id": "600062902",
@@ -61,7 +61,7 @@
    "id": "600061665",
    "name": "UFC Fight Night: Proch\u00e1zka vs. Stirling",
    "date": "2026-11-21T15:00Z",
-   "state": "in",
+   "state": "post",
    "venue": "ABHA Arena"
   },
   {
